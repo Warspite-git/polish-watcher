@@ -195,7 +195,8 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
     else:
         logger.info(f"{len(queue)} alerta(s) enviado(s) ao Telegram")
     st.save_outbox(failed[-OUTBOX_MAX_SIZE:], state_dir)
-    _remember_messages([a for a in queue if a not in failed], state_dir, now)
+    wants_sold_out = {s.key for s in settings.stores if s.alerts.sold_out}
+    _remember_messages([a for a in queue if a not in failed and a.store_key in wants_sold_out], state_dir, now)
 
 
 ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, LOW_STOCK}

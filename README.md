@@ -8,7 +8,7 @@ O monitor lê o catálogo **inteiro** de cada loja e avisa quando:
 |---|---|---|
 | 🆕 NOVIDADE | apareceu um produto que não existia | ligado |
 | 🚨 RESTOCK | produto (ou variante) passou de esgotado para disponível | ligado |
-| ⚡ Esgotou | um produto anunciado esgotou (até 48h depois): o bot **responde ao alerta original** dizendo em quanto tempo | ligado |
+| ⚡ Esgotou | um produto anunciado esgotou (até 48h depois): o bot **responde ao alerta original** dizendo em quanto tempo | desligado |
 | 🔓 / 🔒 Loja aberta / fechada | a loja reabriu ou fechou com senha (lançamento, reforma) | ligado |
 | ⏳ ÚLTIMAS UNIDADES | o estoque caiu para o limite que você escolheu (ex.: 3) | desligado |
 | 🏷️ PREÇO MUDOU | o preço do produto mudou | desligado |
@@ -56,7 +56,7 @@ Pronto. Na próxima rodada o monitor:
       estoque_baixo: 3                     # false, ou avisa quando cair para 3 ou menos
       preco: true                          # mudança de preço
       loja_fechada: true                   # fechou com senha / reabriu
-      esgotou: true                        # responde ao alerta quando o produto esgota
+      esgotou: true                        # responde ao alerta quando o produto esgota (padrão: desligado)
     filtros:
       incluir: [magnético, holo]           # só avisa se o nome tiver alguma dessas palavras
       excluir: [lixa, base, top coat]      # nunca avisa se o nome tiver alguma dessas palavras

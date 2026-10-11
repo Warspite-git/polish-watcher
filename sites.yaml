@@ -15,7 +15,7 @@ padrao:
     estoque_baixo: false    # false ou um número (ex.: 3 → avisa quando cair para 3 ou menos)
     preco: false            # mudança de preço
     loja_fechada: true      # loja fechou com senha / reabriu (lançamentos, reformas)
-    esgotou: true           # responde ao alerta original quando o produto esgota
+    esgotou: false          # true = responde ao alerta original quando o produto esgota
   filtros:
     incluir: []             # se tiver algo, só avisa de produtos com alguma dessas palavras
     excluir: []             # nunca avisa de produtos com alguma dessas palavras
