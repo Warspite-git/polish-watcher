@@ -150,3 +150,12 @@ def test_consistent_page_sizes():
     assert consistent_page_sizes([12])
     assert not consistent_page_sizes([9, 50, 50])
     assert not consistent_page_sizes([20, 20, 30])
+
+
+def test_image_upload_date():
+    from monitor.adapters.nuvemshop import image_upload_date
+    url = ("https://acdn-us.mitiendanube.com/stores/294/962/products/"
+           "b1461801-24e2-4a02-93ea-e7a20f1ab827-4c4a0541911674e1c717916540182072-640-0.jpg")
+    assert image_upload_date(url) == "2026-10-10T17:40:18+00:00"
+    assert image_upload_date("https://x.test/tmp/foto.jpg") is None
+    assert image_upload_date(None) is None

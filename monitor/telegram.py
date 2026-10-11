@@ -6,13 +6,14 @@ import json
 import logging
 import re
 import time
+import unicodedata
 from typing import Dict, List, Optional
 
 import requests
 
 from .fetcher import user_agent
-from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
-                     STORE_RECOVERED, VARIANT_RESTOCK, Alert)
+from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
+                     STORE_RECOVERED, VARIANT_RESTOCK, Alert, clean_text)
 
 API = "https://api.telegram.org"
 logger = logging.getLogger("monitor")
@@ -23,17 +24,27 @@ MAX_ALBUM_ITEMS = 50     # numa rodada gigante, o que passar disso vai só em te
 MIN_INTERVAL = 1.1       # segundos entre mensagens (limite ~1 msg/s por chat)
 
 TITLES = {
-    NEW: "🆕 <b>Produto novo</b>",
-    RESTOCK: "✅ <b>De volta ao estoque</b>",
-    VARIANT_RESTOCK: "✅ <b>Variante de volta ao estoque</b>",
-    LOW_STOCK: "⏳ <b>Últimas unidades</b>",
-    PRICE: "🏷️ <b>Preço mudou</b>",
-    STORE_OPEN: "🔓 <b>Loja aberta</b>",
-    STORE_CLOSED: "🔒 <b>Loja fechada com senha</b>",
-    STORE_ERROR: "⚠️ <b>Não estou conseguindo ler a loja</b>",
-    STORE_RECOVERED: "🔧 <b>Voltei a conseguir ler a loja</b>",
+    NEW: "🆕 <b>NOVIDADE</b>",
+    RESTOCK: "🚨 <b>RESTOCK</b>",
+    VARIANT_RESTOCK: "🚨 <b>RESTOCK DE VARIANTE</b>",
+    LOW_STOCK: "⏳ <b>ÚLTIMAS UNIDADES</b>",
+    PRICE: "🏷️ <b>PREÇO MUDOU</b>",
+    SOLD_OUT: "⚡ <b>ESGOTOU</b>",
+    STORE_OPEN: "🔓 <b>LOJA ABERTA</b>",
+    STORE_CLOSED: "🔒 <b>LOJA FECHADA COM SENHA</b>",
+    STORE_ERROR: "⚠️ <b>NÃO ESTOU CONSEGUINDO LER A LOJA</b>",
+    STORE_RECOVERED: "🔧 <b>VOLTEI A LER A LOJA</b>",
 }
-ICONS = {NEW: "🆕", RESTOCK: "✅", VARIANT_RESTOCK: "✅", LOW_STOCK: "⏳", PRICE: "🏷️"}
+ICONS = {NEW: "🆕", RESTOCK: "🚨", VARIANT_RESTOCK: "🚨", LOW_STOCK: "⏳", PRICE: "🏷️", SOLD_OUT: "⚡"}
+# Hashtags por tipo: tocando nelas, o membro filtra o histórico do grupo
+TYPE_TAGS = {
+    NEW: "#novidade", RESTOCK: "#restock", VARIANT_RESTOCK: "#restock", LOW_STOCK: "#ultimasunidades",
+    PRICE: "#preco", SOLD_OUT: "#esgotou", STORE_OPEN: "#lojaaberta", STORE_CLOSED: "#lojafechada",
+    STORE_ERROR: "#aviso", STORE_RECOVERED: "#aviso",
+}
+# Avisos menos urgentes chegam sem som. "Loja aberta", novidades e restocks tocam.
+SILENT = {PRICE, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_RECOVERED}
+URGENT_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, LOW_STOCK}
 KIND_ORDER = {RESTOCK: 0, VARIANT_RESTOCK: 1, NEW: 2, LOW_STOCK: 3, PRICE: 4}
 
 
@@ -60,6 +71,26 @@ def attr(text) -> str:
     return html.escape(str(text), quote=True)
 
 
+def hashtag(text: str) -> str:
+    """"By Dany Vianna" → "#ByDanyVianna" (sem acentos, espaços ou pontuação)."""
+    text = unicodedata.normalize("NFKD", str(text))
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    tag = "".join(w[:1].upper() + w[1:] for w in re.findall(r"[A-Za-z0-9]+", text))
+    if not tag:
+        return ""
+    return "#" + ("Loja" + tag if tag[0].isdigit() else tag)
+
+
+def tags(a: Alert) -> str:
+    store = hashtag(a.store_tag) if a.store_tag else hashtag(a.store)
+    return " ".join(t for t in (store, TYPE_TAGS.get(a.kind, "")) if t)
+
+
+def is_urgent(a: Alert, urgent_stock: int) -> bool:
+    return (a.kind in URGENT_KINDS and a.available and isinstance(a.stock, int)
+            and 0 < a.stock <= urgent_stock)
+
+
 def stock_text(a: Alert) -> str:
     if not a.available:
         return "esgotado"
@@ -68,34 +99,74 @@ def stock_text(a: Alert) -> str:
     return "1 unidade" if a.stock == 1 else f"{a.stock} unidades"
 
 
-def caption(a: Alert) -> str:
+def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False) -> str:
+    """Legenda do alerta. Os links vão em botões; with_link=True os coloca no texto."""
+    if a.kind == SOLD_OUT:
+        return "\n".join([f"⚡ <b>{esc(a.note or 'Esgotou')}!</b>",
+                          f"<b>{esc(_cut(a.name, 200))}</b> · {esc(a.store)}", tags(a)])
     lines = [f"{TITLES.get(a.kind, a.kind)} · {esc(a.store)}"]
     if a.is_store_alert:
         if a.note:
             lines.append(esc(a.note))
-        lines.append(f'🔗 <a href="{attr(a.store_url)}">Abrir a loja</a>')
+        if with_link:
+            lines.append(f'🔗 <a href="{attr(a.store_url)}">Abrir a loja</a>')
+        lines.append(tags(a))
         return "\n".join(lines)
     lines.append(f"<b>{esc(_cut(a.name, 200))}</b>")
     if a.variants:
         lines.append("🎨 " + esc(_cut(", ".join(a.variants), 300)))
     if a.kind == PRICE and a.old_price is not None:
-        lines.append(f"💰 <s>{brl(a.old_price)}</s> → <b>{brl(a.price)}</b>")
-    elif a.price is not None:
-        lines.append(f"💰 {brl(a.price)}")
-    lines.append("📦 " + stock_text(a))
+        price = f"💰 <s>{brl(a.old_price)}</s> → <b>{brl(a.price)}</b>"
+    else:
+        price = f"💰 {brl(a.price)}" if a.price is not None else ""
+    if is_urgent(a, urgent_stock):
+        lines.append(price)
+        lines.append("🔥 Última unidade. Corre!" if a.stock == 1 else f"🔥 Só {a.stock} unidades. Corre!")
+    else:
+        lines.append(" · ".join(x for x in (price, "📦 " + stock_text(a)) if x))
     if a.note:
         lines.append(esc(a.note))
-    lines.append(f'🔗 <a href="{attr(a.url)}">Ver na loja</a>')
+    if with_link:
+        lines.append(f'🔗 <a href="{attr(a.url)}">Ver na loja</a>')
+    lines.append(tags(a))
     return "\n".join(lines)
 
 
-def compact_line(a: Alert, index: Optional[int] = None) -> str:
+def buttons(a: Alert, urgent_stock: int = 5) -> Optional[dict]:
+    """Botões de toque abaixo do alerta (só links http/https)."""
+    if a.kind == SOLD_OUT:
+        return None
+    row = []
+    if a.is_store_alert:
+        row.append({"text": "🏪 Abrir a loja", "url": a.store_url})
+    else:
+        label = "🛒 Comprar agora" if is_urgent(a, urgent_stock) else ("🛒 Comprar" if a.available else "🔎 Ver produto")
+        row.append({"text": label, "url": a.url})
+        row.append({"text": "🏪 Ver a loja", "url": a.store_url})
+    row = [b for b in row if str(b["url"]).startswith(("https://", "http://"))]
+    return {"inline_keyboard": [row]} if row else None
+
+
+def compact_line(a: Alert, index: Optional[int] = None, urgent_stock: int = 5) -> str:
     """Uma linha por alerta, para álbuns e resumos."""
     prefix = f"{index}. " if index is not None else ""
     price = (f"<s>{brl(a.old_price)}</s> → {brl(a.price)}" if a.kind == PRICE and a.old_price is not None
              else brl(a.price))
-    stock = "" if a.stock is None or not a.available else f" · {a.stock} un."
+    stock = ""
+    if a.available and isinstance(a.stock, int):
+        stock = f" · 🔥 {a.stock} un." if is_urgent(a, urgent_stock) else f" · {a.stock} un."
+    elif not a.available:
+        stock = " · esgotado"
     return f'{prefix}{ICONS.get(a.kind, "•")} <a href="{attr(a.url)}">{esc(_cut(a.name, 45))}</a> — {price}{stock}'
+
+
+def group_tags(alerts: List[Alert]) -> str:
+    out: List[str] = []
+    for a in alerts:
+        for t in tags(a).split():
+            if t not in out:
+                out.append(t)
+    return " ".join(out)
 
 
 def visible_len(text: str) -> int:
@@ -115,10 +186,11 @@ def _summary_header(store: str, count: int, part: str = "") -> str:
 # ---------------------------------------------------------------- cliente
 
 class Telegram:
-    def __init__(self, token: str, chat_id: str, timeout: float = 30):
+    def __init__(self, token: str, chat_id: str, timeout: float = 30, urgent_stock: int = 5):
         self.token = token
         self.chat_id = str(chat_id)
         self.timeout = timeout
+        self.urgent_stock = urgent_stock
         self._last = 0.0
 
     def redact(self, text: str) -> str:
@@ -165,16 +237,17 @@ class Telegram:
 
     # --- mensagens básicas
 
-    def send_text(self, text: str, preview: bool = False):
+    def send_text(self, text: str, preview: bool = False, extra: Optional[dict] = None):
         return self.call("sendMessage", {
             "chat_id": self.chat_id,
             "text": text,
             "parse_mode": "HTML",
             "link_preview_options": json.dumps({"is_disabled": not preview}),
+            **(extra or {}),
         })
 
-    def send_photo(self, photo_url: str, text: str):
-        data = {"chat_id": self.chat_id, "caption": text, "parse_mode": "HTML"}
+    def send_photo(self, photo_url: str, text: str, extra: Optional[dict] = None):
+        data = {"chat_id": self.chat_id, "caption": text, "parse_mode": "HTML", **(extra or {})}
         try:
             return self.call("sendPhoto", {**data, "photo": photo_url})
         except TelegramError:
@@ -186,52 +259,86 @@ class Telegram:
         return self.call("sendPhoto", data, files={"photo": ("produto.jpg", content)})
 
     def send_album(self, alerts: List[Alert], header: str):
-        lines = [header]
+        lines = [header, group_tags(alerts)]
         for i, a in enumerate(alerts, start=1):
-            lines.append(compact_line(a, i))
+            lines.append(compact_line(a, i, self.urgent_stock))
         text = "\n".join(lines)
-        while visible_len(text) > CAPTION_LIMIT and len(lines) > 2:
+        while visible_len(text) > CAPTION_LIMIT and len(lines) > 3:
             lines.pop()
             text = "\n".join(lines + ["…"])
         media = [{"type": "photo", "media": a.image} for a in alerts]
         media[0].update({"caption": text, "parse_mode": "HTML"})
-        return self.call("sendMediaGroup", {"chat_id": self.chat_id, "media": json.dumps(media)})
+        sent = self.call("sendMediaGroup", {"chat_id": self.chat_id, "media": json.dumps(media)})
+        if isinstance(sent, list):
+            for a, msg in zip(alerts, sent):
+                a.message_id = (msg or {}).get("message_id")
+        return sent
 
-    def send_digest(self, alerts: List[Alert]):
+    def send_digest(self, alerts: List[Alert], silent: bool = False):
         """Resumo só em texto, dividido em mensagens dentro do limite do Telegram."""
         by_store: Dict[str, List[Alert]] = {}
         for a in alerts:
             by_store.setdefault(a.store, []).append(a)
-        chunks, current = [], ""
+        chunks: List[tuple] = []  # (texto, alertas daquele texto)
+        text, members = "", []
         for store, items in by_store.items():
-            block = [_summary_header(store, len(items))] + [compact_line(a) for a in items]
-            for line in block:
-                if current and len(current) + len(line) + 1 > MESSAGE_LIMIT - 100:
-                    chunks.append(current)
-                    current = ""
-                current = f"{current}\n{line}" if current else line
-            current += "\n"
-        if current.strip():
-            chunks.append(current)
-        for chunk in chunks:
-            self.send_text(chunk.strip())
+            block = [(_summary_header(store, len(items)) + "\n" + group_tags(items), None)]
+            block += [(compact_line(a, urgent_stock=self.urgent_stock), a) for a in items]
+            for line, a in block:
+                if text and len(text) + len(line) + 1 > MESSAGE_LIMIT - 100:
+                    chunks.append((text, members))
+                    text, members = "", []
+                text = f"{text}\n{line}" if text else line
+                if a is not None:
+                    members.append(a)
+            text += "\n"
+        if text.strip():
+            chunks.append((text, members))
+        extra = {"disable_notification": "true"} if silent else None
+        for chunk, members in chunks:
+            msg = self.send_text(chunk.strip(), extra=extra) or {}
+            for a in members:
+                a.message_id = msg.get("message_id")
 
     # --- alertas
 
-    def send_alert(self, a: Alert):
-        text = caption(a)
-        if a.image and not a.is_store_alert:
+    def _extra(self, a: Alert, with_buttons: bool = True) -> dict:
+        extra = {}
+        markup = buttons(a, self.urgent_stock) if with_buttons else None
+        if markup:
+            extra["reply_markup"] = json.dumps(markup)
+        if a.kind in SILENT:
+            extra["disable_notification"] = "true"
+        if a.reply_to:
+            extra["reply_parameters"] = json.dumps({"message_id": a.reply_to, "allow_sending_without_reply": True})
+        return extra
+
+    def _send_one(self, a: Alert, text: str, extra: dict):
+        if a.image and not a.is_store_alert and a.kind != SOLD_OUT:
             try:
-                return self.send_photo(a.image, text)
+                return self.send_photo(a.image, text, extra)
             except TelegramError:
                 pass  # sem foto: manda texto com prévia do link (o Telegram mostra a imagem da loja)
-        return self.send_text(text, preview=not a.is_store_alert)
+        preview = not a.is_store_alert and a.kind != SOLD_OUT
+        return self.send_text(text, preview=preview, extra=extra)
+
+    def send_alert(self, a: Alert):
+        try:
+            msg = self._send_one(a, caption(a, self.urgent_stock), self._extra(a))
+        except TelegramError as e:
+            if "button" not in str(e).lower() and "reply_markup" not in str(e).lower():
+                raise
+            # botão recusado (link inválido?): manda sem botões, com o link no texto
+            msg = self._send_one(a, caption(a, self.urgent_stock, with_link=True), self._extra(a, with_buttons=False))
+        a.message_id = (msg or {}).get("message_id") if isinstance(msg, dict) else None
+        return msg
 
     def send_alerts(self, alerts: List[Alert], max_individual: int = 10) -> List[Alert]:
         """Envia tudo e devolve os alertas que falharam (para tentar de novo na próxima rodada)."""
         failed: List[Alert] = []
         store_alerts = [a for a in alerts if a.is_store_alert]
-        product_alerts = [a for a in alerts if not a.is_store_alert]
+        sold_out = [a for a in alerts if a.kind == SOLD_OUT]
+        product_alerts = [a for a in alerts if not a.is_store_alert and a.kind != SOLD_OUT]
 
         for a in store_alerts:
             try:
@@ -245,9 +352,25 @@ class Telegram:
                     self.send_alert(a)
                 except TelegramError:
                     failed.append(a)
-            return failed
+        else:
+            failed += self._send_grouped(product_alerts)
 
-        # Muitos alertas: álbuns de até 10 fotos por loja, com a lista numerada na legenda.
+        # "Esgotou": cada um responde ao seu alerta; se forem muitos, vira um resumo silencioso
+        if len(sold_out) <= max_individual:
+            for a in sold_out:
+                try:
+                    self.send_alert(a)
+                except TelegramError:
+                    failed.append(a)
+        elif sold_out:
+            try:
+                self.send_digest(sold_out, silent=True)
+            except TelegramError:
+                failed += sold_out
+        return failed
+
+    def _send_grouped(self, product_alerts: List[Alert]) -> List[Alert]:
+        """Muitos alertas: álbuns de até 10 fotos por loja, com a lista numerada na legenda."""
         by_store: Dict[str, List[Alert]] = {}
         for a in product_alerts:
             by_store.setdefault(a.store, []).append(a)
@@ -273,11 +396,62 @@ class Telegram:
             try:
                 self.send_digest(leftovers)
             except TelegramError:
-                failed += leftovers
-        return failed
+                return leftovers
+        return []
 
     def get_updates(self) -> list:
         return self.call("getUpdates", {"timeout": 0}) or []
+
+    def leave_foreign_chats(self) -> List[str]:
+        """Garante que o bot só funcione no grupo configurado.
+
+        Sai de qualquer outro grupo em que alguém tenha adicionado o bot (canais só geram
+        aviso no log, porque podem ser o seu próprio canal sendo montado). Travas:
+        - um supergrupo criado a partir do grupo configurado (migração) é mantido;
+        - se o bot não estiver no grupo configurado (ID errado?), não sai de nada.
+        Devolve a lista de chats que o bot deixou.
+        """
+        updates = self.call("getUpdates", {
+            "timeout": 0, "allowed_updates": json.dumps(["my_chat_member", "message"])}) or []
+        if not updates:
+            return []
+        allowed = {self.chat_id}
+        for u in updates:
+            msg = u.get("message") or {}
+            if str(msg.get("migrate_from_chat_id")) in allowed:
+                allowed.add(str(msg["chat"]["id"]))
+        foreign: Dict[str, str] = {}
+        for u in updates:  # em ordem: o último evento de cada chat vale
+            m = u.get("my_chat_member")
+            if not m or m["chat"]["type"] == "private" or str(m["chat"]["id"]) in allowed:
+                continue
+            if m["chat"]["type"] == "channel":
+                # Pode ser o seu canal novo: não sai, só avisa (o bot não posta lá sem o chat_id).
+                if m["new_chat_member"]["status"] in ("member", "administrator"):
+                    logger.warning(f"o bot foi adicionado ao canal {clean_text(m['chat'].get('title'))} "
+                                   f"({m['chat']['id']}); se for seu, atualize o TELEGRAM_CHAT_ID")
+                continue
+            cid = str(m["chat"]["id"])
+            if m["new_chat_member"]["status"] in ("member", "administrator", "restricted"):
+                foreign[cid] = m["chat"].get("title") or m["chat"]["type"]
+            else:
+                foreign.pop(cid, None)
+        left = []
+        if foreign:
+            me = self.call("getMe")
+            status = (self.call("getChatMember", {"chat_id": self.chat_id, "user_id": me["id"]}) or {}).get("status")
+            if status not in ("member", "administrator", "creator", "restricted"):
+                logger.warning("o bot não está no grupo configurado; por segurança não vou sair de outros chats")
+            else:
+                for cid, title in foreign.items():
+                    try:
+                        self.call("leaveChat", {"chat_id": cid})
+                        left.append(f"{title} ({cid})")
+                    except TelegramError as e:
+                        logger.warning(f"não consegui sair de {title}: {e}")
+        # confirma as atualizações lidas, para não reprocessá-las
+        self.call("getUpdates", {"offset": updates[-1]["update_id"] + 1, "timeout": 0})
+        return left
 
 
 def _download(url: str, limit: int = 10 * 1024 * 1024) -> Optional[bytes]:

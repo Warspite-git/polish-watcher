@@ -83,6 +83,8 @@ def parse_product(raw: dict, base_url: str) -> Product:
         available=available,
         stock=stock,
         variants=variants,
+        added_at=raw.get("published_at") or raw.get("created_at"),
+        added_at_exact=True,
     )
 
 

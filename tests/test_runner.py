@@ -97,3 +97,50 @@ def test_real_sites_yaml_loads():
     assert keys, "o sites.yaml precisa ter pelo menos uma loja"
     assert len(keys) == len(set(keys))  # sem lojas repetidas
     assert all(s.url.startswith("https://") for s in settings.stores)
+
+
+def test_collect_recent_orders_by_date_and_filters(env):
+    from monitor.recent import collect_recent
+    settings, _ = env
+    def p(pid, added, avail=True, exact=False):
+        return Product(id=pid, name=f"Esmalte {pid}", url=f"https://f.test/{pid}", available=avail,
+                       added_at=added, added_at_exact=exact)
+    FakeAdapter.script = [ScanResult(status="open", products={x.id: x for x in [
+        p("velho", "2026-10-01T12:00:00+00:00"),
+        p("b", "2026-10-10T15:00:00+00:00", exact=True),
+        p("a", "2026-10-09T12:00:00+00:00"),
+        p("esgotado", "2026-10-10T16:00:00+00:00", avail=False),
+        p("sem-data", None),
+    ]})]
+    alerts = collect_recent(settings, 3, now=NOW)
+    assert [a.name for a in alerts] == ["Esmalte a", "Esmalte b", "Esmalte esgotado"]
+    assert alerts[0].note == "🗓️ Adicionado em 09/10 (aprox.)"
+    assert alerts[1].note == "🗓️ Adicionado em 10/10 às 12:00"  # horário de Brasília
+    FakeAdapter.script = [ScanResult(status="open", products={"x": p("x", "2026-10-10T16:00:00+00:00", avail=False)})]
+    assert collect_recent(settings, 3, now=NOW, available_only=True) == []
+
+
+
+def test_announced_products_remember_message_and_get_sold_out_reply(env, monkeypatch):
+    """Rodada 1: restock enviado (mensagem 555). Rodada 2: esgotou → resposta à mensagem 555."""
+    from datetime import timedelta
+    import monitor.telegram as tgmod
+    settings, state_dir = env
+    sent = []
+
+    def fake_call(self, method, data=None, files=None, retries=3):
+        sent.append((method, dict(data or {})))
+        return [] if method == "getUpdates" else {"message_id": 555}
+
+    monkeypatch.setattr(tgmod.Telegram, "call", fake_call)
+    monkeypatch.setenv("TELEGRAM_TOKEN", "T")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "-100")
+    FakeAdapter.script = [open_scan(("1", False)), open_scan(("1", True)), open_scan(("1", False))]
+    runner.run(settings, state_dir=state_dir, now=NOW)                          # linha de base
+    runner.run(settings, state_dir=state_dir, now=NOW)                          # restock
+    assert st.load("f.test", state_dir)["products"]["1"]["alert"]["msg"] == 555
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=14))  # esgotou
+    method, data = sent[-1]
+    assert method == "sendMessage" and "Esgotou em menos de 15 minutos" in data["text"]
+    assert '"message_id": 555' in data["reply_parameters"]
+    assert "alert" not in st.load("f.test", state_dir)["products"]["1"]

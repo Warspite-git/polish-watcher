@@ -33,6 +33,8 @@ class Product:
     stock: Optional[int] = None  # None = sem controle de estoque / desconhecido
     # None = a listagem não informa variantes (precisa abrir a página do produto)
     variants: Optional[Dict[str, Variant]] = None
+    added_at: Optional[str] = None  # quando o produto entrou na loja (ISO, UTC), se der para saber
+    added_at_exact: bool = False    # False = estimativa (ex.: data de upload da foto)
 
 
 @dataclass
@@ -48,6 +50,7 @@ RESTOCK = "restock"
 VARIANT_RESTOCK = "variant_restock"
 LOW_STOCK = "low_stock"
 PRICE = "price"
+SOLD_OUT = "sold_out"  # resposta "⚡ esgotou" ao alerta que anunciou o produto
 STORE_OPEN = "store_open"
 STORE_CLOSED = "store_closed"
 STORE_ERROR = "store_error"
@@ -62,6 +65,7 @@ LABELS = {
     VARIANT_RESTOCK: "restock(s) de variante",
     LOW_STOCK: "estoque baixo",
     PRICE: "mudança(s) de preço",
+    SOLD_OUT: "esgotado(s)",
     STORE_OPEN: "loja abriu",
     STORE_CLOSED: "loja fechou",
     STORE_ERROR: "aviso de erro",
@@ -91,6 +95,11 @@ class Alert:
     variants: List[str] = field(default_factory=list)
     note: str = ""
     created: str = ""
+    store_key: str = ""            # domínio da loja (arquivo de estado)
+    store_tag: str = ""            # hashtag da loja; vazio = gerada a partir do nome
+    product_id: str = ""
+    reply_to: Optional[int] = None  # responder a esta mensagem do Telegram
+    message_id: Optional[int] = None  # preenchido depois do envio
 
     @property
     def is_store_alert(self) -> bool:

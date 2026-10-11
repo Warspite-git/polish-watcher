@@ -23,6 +23,7 @@ class AlertConfig:
     low_stock: Optional[int] = None  # limite; None = desligado
     price_change: bool = False
     store_status: bool = True
+    sold_out: bool = True  # responde ao alerta quando o produto esgota
 
 
 @dataclass
@@ -37,6 +38,7 @@ class StoreConfig:
     exclude: List[str] = field(default_factory=list)
     enabled: bool = True
     listing_path: str = "/produtos/"
+    hashtag: str = ""  # vazio = gerada a partir do nome (ex.: "By Dany Vianna" → #ByDanyVianna)
 
     def wants(self, product_name: str) -> bool:
         """Aplica os filtros de palavra-chave (sem diferenciar maiúsculas/acentos)."""
@@ -54,6 +56,7 @@ class Settings:
     max_individual_alerts: int = 10
     error_alert_after: int = 8
     max_product_pages: int = 15
+    urgent_stock: int = 5  # selo "🔥 Só N unidades" quando o estoque está no limite ou abaixo
 
 
 def normalize(text: str) -> str:
@@ -94,6 +97,7 @@ def _alerts(raw: dict, base: AlertConfig) -> AlertConfig:
         low_stock=_parse_low_stock(raw["estoque_baixo"]) if "estoque_baixo" in raw else base.low_stock,
         price_change=bool(raw.get("preco", base.price_change)),
         store_status=bool(raw.get("loja_fechada", base.store_status)),
+        sold_out=bool(raw.get("esgotou", base.sold_out)),
     )
 
 
@@ -141,6 +145,7 @@ def load_settings(path: str = "sites.yaml") -> Settings:
             exclude=_words(filters.get("excluir", default_filters.get("excluir"))),
             enabled=bool(raw.get("ativo", True)),
             listing_path=str(raw.get("caminho_listagem", "/produtos/")),
+            hashtag=str(raw.get("hashtag") or "").lstrip("#"),
         ))
 
     tg = data.get("telegram") or {}
@@ -148,6 +153,7 @@ def load_settings(path: str = "sites.yaml") -> Settings:
     return Settings(
         stores=stores,
         max_individual_alerts=int(tg.get("max_alertas_individuais", 10)),
+        urgent_stock=int(tg.get("urgencia_estoque", 5)),
         error_alert_after=int(adv.get("falhas_para_avisar", 8)),
         max_product_pages=int(adv.get("max_paginas_produto", 15)),
     )

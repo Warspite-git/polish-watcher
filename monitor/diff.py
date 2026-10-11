@@ -1,11 +1,12 @@
 """Compara a varredura atual com o estado salvo e gera os alertas (funções puras)."""
 from __future__ import annotations
 
+import math
 from datetime import date, datetime, timedelta
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from .config import StoreConfig
-from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, VARIANT_RESTOCK, Alert, Product,
+from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, SOLD_OUT, VARIANT_RESTOCK, Alert, Product,
                      ScanResult, Variant)
 
 # Produto some da listagem em N varreduras completas seguidas → tratado como indisponível
@@ -14,6 +15,7 @@ MISSING_TO_UNAVAILABLE = 2
 FORGET_AFTER_DAYS = 120
 VARIANT_REFRESH_HOURS = 6
 MAX_STALE_REFRESH = 5
+SOLD_OUT_WINDOW_HOURS = 48  # só responde "esgotou" se o alerta original for recente
 
 
 def record_from(p: Product, prev: Optional[dict], today: str, now_iso: str, variants_from_page: bool) -> dict:
@@ -38,6 +40,8 @@ def record_from(p: Product, prev: Optional[dict], today: str, now_iso: str, vari
         for k in ("nv", "variants", "variants_checked"):
             if k in prev:
                 rec[k] = prev[k]
+    if prev and prev.get("alert") and p.available:
+        rec["alert"] = prev["alert"]  # mensagem que anunciou o produto (para responder "esgotou")
     return rec
 
 
@@ -111,6 +115,11 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
             if back:
                 alerts.append(_alert(VARIANT_RESTOCK, store, p, variants=[_variant_label(v) for v in back]))
 
+        if was_available and not p.available and cfg.sold_out:
+            note = sold_out_note(prev.get("alert"), now)
+            if note:
+                alerts.append(_alert(SOLD_OUT, store, p, reply_to=prev["alert"]["msg"], note=note))
+
         threshold = cfg.low_stock
         if (threshold and was_available and p.available and isinstance(p.stock, int)
                 and isinstance(old_stock, int) and old_stock > threshold >= p.stock > 0):
@@ -130,7 +139,15 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
             rec["missing"] = min(rec.get("missing", 0) + 1, MISSING_TO_UNAVAILABLE)
             rec.setdefault("missing_since", today)
             if rec["missing"] >= MISSING_TO_UNAVAILABLE:
+                if rec.get("available") and cfg.sold_out and store.wants(rec.get("name", "")):
+                    note = sold_out_note(rec.get("alert"), now)
+                    if note:  # a loja escondeu o produto: provavelmente esgotou
+                        alerts.append(Alert(kind=SOLD_OUT, store=store.name, store_url=store.url,
+                                            name=rec.get("name", ""), url=rec.get("url", ""), available=False,
+                                            reply_to=rec["alert"]["msg"], note=note, store_key=store.key,
+                                            store_tag=store.hashtag, product_id=pid))
                 rec["available"] = False
+                rec.pop("alert", None)
             if _days_since(rec["missing_since"], now.date()) > FORGET_AFTER_DAYS:
                 continue  # removido há muito tempo: esquece
         products[pid] = rec
@@ -140,7 +157,28 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
 
 def _alert(kind: str, store: StoreConfig, p: Product, **extra) -> Alert:
     return Alert(kind=kind, store=store.name, store_url=store.url, name=p.name, url=p.url,
-                 image=p.image, price=p.price, stock=p.stock, available=p.available, **extra)
+                 image=p.image, price=p.price, stock=p.stock, available=p.available,
+                 store_key=store.key, store_tag=store.hashtag, product_id=p.id, **extra)
+
+
+def sold_out_note(sent: Optional[dict], now: datetime) -> Optional[str]:
+    """Texto "Esgotou em menos de X" a partir do alerta original; None se não houver ou for antigo.
+
+    O monitor só percebe a mudança na rodada seguinte, então o tempo é um limite superior.
+    """
+    if not sent or not sent.get("msg"):
+        return None
+    try:
+        elapsed = now - datetime.fromisoformat(sent["at"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if elapsed < timedelta(0) or elapsed > timedelta(hours=SOLD_OUT_WINDOW_HOURS):
+        return None
+    minutes = elapsed.total_seconds() / 60
+    if minutes < 55:
+        return f"Esgotou em menos de {max(5, math.ceil(minutes / 5) * 5)} minutos"
+    hours = max(1, math.ceil(minutes / 60))
+    return f"Esgotou em menos de {hours} hora{'s' if hours > 1 else ''}"
 
 
 def _variant_label(v: Variant) -> str:

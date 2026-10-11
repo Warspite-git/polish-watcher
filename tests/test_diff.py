@@ -124,3 +124,51 @@ def test_select_variant_fetches():
     current = scan(prod("1", stock=9), prod("2", stock=3), prod("3", stock=9), prod("4", stock=5), prod("5"))
     assert select_variant_fetches(old, current, cap=10, now=NOW) == ["2", "1", "5", "4"]
     assert select_variant_fetches(old, current, cap=2, now=NOW) == ["2", "1"]
+
+
+# ------------------------------------------------------------ "esgotou"
+
+from monitor.diff import sold_out_note
+
+
+def test_sold_out_note():
+    at = (NOW - timedelta(minutes=12)).isoformat()
+    assert sold_out_note({"msg": 5, "at": at}, NOW) == "Esgotou em menos de 15 minutos"
+    assert sold_out_note({"msg": 5, "at": (NOW - timedelta(minutes=2)).isoformat()}, NOW) == "Esgotou em menos de 5 minutos"
+    assert sold_out_note({"msg": 5, "at": (NOW - timedelta(minutes=58)).isoformat()}, NOW) == "Esgotou em menos de 1 hora"
+    assert sold_out_note({"msg": 5, "at": (NOW - timedelta(hours=5, minutes=1)).isoformat()}, NOW) == "Esgotou em menos de 6 horas"
+    assert sold_out_note({"msg": 5, "at": (NOW - timedelta(days=3)).isoformat()}, NOW) is None  # antigo demais
+    assert sold_out_note(None, NOW) is None
+
+
+def test_sold_out_reply_only_for_announced_products():
+    old = baseline(scan(prod("1"), prod("2")), NOW)
+    old["1"]["alert"] = {"msg": 42, "at": (NOW - timedelta(minutes=20)).isoformat()}
+    alerts, state = diff_products(store(), old, scan(prod("1", available=False, stock=0),
+                                                     prod("2", available=False, stock=0)), NOW)
+    assert [(a.kind, a.reply_to, a.note) for a in alerts] == [("sold_out", 42, "Esgotou em menos de 20 minutos")]
+    assert "alert" not in state["1"]  # não responde duas vezes
+    assert alerts[0].store_key == "loja.test" and alerts[0].product_id == "1"
+
+
+def test_alert_record_survives_while_available():
+    old = baseline(scan(prod("1")), NOW)
+    old["1"]["alert"] = {"msg": 42, "at": NOW.isoformat()}
+    _, state = diff_products(store(), old, scan(prod("1", stock=3)), NOW)
+    assert state["1"]["alert"]["msg"] == 42
+
+
+def test_sold_out_can_be_disabled():
+    old = baseline(scan(prod("1")), NOW)
+    old["1"]["alert"] = {"msg": 42, "at": NOW.isoformat()}
+    alerts, _ = diff_products(store(sold_out=False), old, scan(prod("1", available=False, stock=0)), NOW)
+    assert alerts == []
+
+
+def test_hidden_product_counts_as_sold_out():
+    old = baseline(scan(prod("1"), prod("2")), NOW)
+    old["2"]["alert"] = {"msg": 9, "at": (NOW - timedelta(minutes=30)).isoformat()}
+    _, state = diff_products(store(), old, scan(prod("1")), NOW)          # sumiu 1 vez
+    alerts, state = diff_products(store(), state, scan(prod("1")), NOW)  # sumiu 2 vezes
+    assert [(a.kind, a.reply_to, a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2")]
+    assert "alert" not in state["2"] and state["2"]["available"] is False

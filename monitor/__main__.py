@@ -5,6 +5,8 @@
     python -m monitor chat-id              lista os chats que falaram com o bot
     python -m monitor test-telegram        envia uma mensagem de teste
     python -m monitor detect <url>         detecta a plataforma de uma loja
+    python -m monitor recentes --dias 3    lista o que entrou nas lojas nos últimos dias
+    python -m monitor recentes --dias 3 --enviar   ...e envia um alerta por produto
 """
 from __future__ import annotations
 
@@ -135,6 +137,45 @@ def _sample_alert(config: str):
     return None
 
 
+def cmd_recentes(args) -> int:
+    import time
+    from .recent import collect_recent
+    from .telegram import TelegramError, stock_text
+    try:
+        settings = load_settings(args.config)
+    except ConfigError as e:
+        logging.error(f"sites.yaml: {e}")
+        return 2
+    alerts = collect_recent(settings, args.dias, only=args.store, available_only=args.disponiveis)
+    dias = int(args.dias) if float(args.dias).is_integer() else args.dias
+    print(f"\n{len(alerts)} produto(s) adicionados nos últimos {dias} dia(s), do mais antigo ao mais novo:")
+    for a in alerts:
+        print(f"  {a.note.replace('🗓️ Adicionado em ', ''):18} {a.store:20} {a.name[:45]:45} {stock_text(a)}")
+    if not args.enviar or not alerts:
+        if alerts:
+            print("\n(nada enviado; use --enviar para mandar ao Telegram)")
+        return 0
+    tg = _telegram()
+    if not tg.chat_id:
+        sys.exit("TELEGRAM_CHAT_ID não definido")
+    failed = 0
+    try:
+        tg.send_text(f"📣 <b>Novidades dos últimos {dias} dias</b>\n"
+                     f"{len(alerts)} produto(s), em ordem de lançamento.")
+    except TelegramError as e:
+        print(f"Falhou ao enviar o cabeçalho: {e}")
+    for i, a in enumerate(alerts, start=1):
+        time.sleep(max(0.0, args.intervalo))  # grupos aceitam ~20 mensagens por minuto
+        try:
+            tg.send_alert(a)
+            print(f"  [{i}/{len(alerts)}] enviado: {a.store} — {a.name[:50]}", flush=True)
+        except TelegramError as e:
+            failed += 1
+            print(f"  [{i}/{len(alerts)}] FALHOU: {a.name[:50]} ({e})", flush=True)
+    print(f"\n{len(alerts) - failed} enviado(s), {failed} falha(s).")
+    return 1 if failed else 0
+
+
 def cmd_detect(args) -> int:
     from .adapters import AdapterError, detect_platform
     base, _ = normalize_url(args.url)
@@ -162,6 +203,12 @@ def main(argv=None) -> int:
     chat_p.add_argument("--wait", type=int, default=0, help="espera até N segundos por uma mensagem")
     chat_p.add_argument("--save", action="store_true", help="grava o chat_id no .env (se houver só um)")
     sub.add_parser("test-telegram", help="envia mensagem de teste")
+    rec = sub.add_parser("recentes", help="produtos que entraram nas lojas nos últimos N dias")
+    rec.add_argument("--dias", type=float, default=3)
+    rec.add_argument("--store", help="só lojas cujo nome/domínio contém este texto")
+    rec.add_argument("--disponiveis", action="store_true", help="só produtos disponíveis")
+    rec.add_argument("--enviar", action="store_true", help="envia um alerta por produto ao Telegram")
+    rec.add_argument("--intervalo", type=float, default=3.5, help="segundos entre mensagens (padrão 3.5)")
     det = sub.add_parser("detect", help="detecta a plataforma de uma loja")
     det.add_argument("url")
 
@@ -174,7 +221,8 @@ def main(argv=None) -> int:
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     load_dotenv()
 
-    commands = {"chat-id": cmd_chat_id, "test-telegram": cmd_test_telegram, "detect": cmd_detect}
+    commands = {"chat-id": cmd_chat_id, "test-telegram": cmd_test_telegram, "detect": cmd_detect,
+                "recentes": cmd_recentes}
     return commands.get(args.command, cmd_run)(args)
 
 

@@ -15,6 +15,7 @@ from __future__ import annotations
 import html
 import json
 import re
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
 from ..fetcher import FetchError, is_password_page
@@ -28,6 +29,8 @@ LD_RE = re.compile(r"<script[^>]*application/ld\+json[^>]*structured-data\.item[
 STOCK_RE = re.compile(r'data-store="stock-product-(\d+)-([^"]*)"')
 VARIANTS_RE = re.compile(r'data-variants="([^"]*)"')
 IMG_SIZE_RE = re.compile(r"-\d+-\d+\.(?:webp|jpe?g|png)$", re.I)
+# ...-<18 hex><10 dígitos = unix timestamp do upload><4 dígitos>-480-0.webp
+IMG_TOKEN_RE = re.compile(r"([0-9a-f]{18})(\d{10})\d{4}(?:-\d+-\d+)?\.\w+(?:\?.*)?$")
 
 AVAILABLE_MARKERS = ("InStock", "LimitedAvailability", "PreOrder", "PreSale", "OnlineOnly", "BackOrder")
 
@@ -138,11 +141,13 @@ def _product_from_ld(pid: str, data: dict, stock_raw: Optional[str]) -> Product:
         available = any(marker in availability for marker in AVAILABLE_MARKERS)
     else:
         available = stock is None or stock > 0
+    image = jpg_image(data.get("image"))
     return Product(
         id=pid,
         name=clean_text(html.unescape(str(data.get("name") or ""))),
         url=url,
-        image=jpg_image(data.get("image")),
+        image=image,
+        added_at=image_upload_date(image),
         price=_float(offers.get("price")),
         available=available,
         stock=stock,
@@ -182,6 +187,21 @@ def parse_stock(raw) -> Optional[int]:
         return int(float(raw))
     except (TypeError, ValueError):
         return None
+
+
+def image_upload_date(url: Optional[str]) -> Optional[str]:
+    """Data de upload da foto principal, embutida no nome do arquivo pela Nuvemshop.
+
+    Na inspeção, essa data acompanhou a ordem de criação dos produtos em 87–99% dos
+    casos, então serve como estimativa de quando o produto entrou na loja.
+    """
+    m = IMG_TOKEN_RE.search(url or "")
+    if not m:
+        return None
+    ts = int(m.group(2))
+    if not 1262304000 <= ts <= 4102444800:  # entre 2010 e 2100
+        return None
+    return datetime.fromtimestamp(ts, timezone.utc).isoformat(timespec="seconds")
 
 
 def jpg_image(img) -> Optional[str]:

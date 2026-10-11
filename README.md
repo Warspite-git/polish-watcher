@@ -6,14 +6,21 @@ O monitor lê o catálogo **inteiro** de cada loja e avisa quando:
 
 | Alerta | Quando dispara | Padrão |
 |---|---|---|
-| 🆕 Produto novo | apareceu um produto que não existia | ligado |
-| ✅ De volta ao estoque | produto (ou variante) passou de esgotado para disponível | ligado |
-| 🔒 / 🔓 Loja fechada / aberta | a loja fechou com senha (lançamento, reforma) ou reabriu | ligado |
-| ⏳ Últimas unidades | o estoque caiu para o limite que você escolheu (ex.: 3) | desligado |
-| 🏷️ Preço mudou | o preço do produto mudou | desligado |
+| 🆕 NOVIDADE | apareceu um produto que não existia | ligado |
+| 🚨 RESTOCK | produto (ou variante) passou de esgotado para disponível | ligado |
+| ⚡ Esgotou | um produto anunciado esgotou (até 48h depois): o bot **responde ao alerta original** dizendo em quanto tempo | ligado |
+| 🔓 / 🔒 Loja aberta / fechada | a loja reabriu ou fechou com senha (lançamento, reforma) | ligado |
+| ⏳ ÚLTIMAS UNIDADES | o estoque caiu para o limite que você escolheu (ex.: 3) | desligado |
+| 🏷️ PREÇO MUDOU | o preço do produto mudou | desligado |
 | ⚠️ Erro | a loja falhou várias rodadas seguidas (site fora do ar, mudança no site) | ligado |
 
-Cada alerta chega com a **foto do produto**, nome, loja, preço, estoque e link. Se aparecerem muitos de uma vez (ex.: lançamento de coleção), eles chegam agrupados em álbuns de até 10 fotos com a lista numerada.
+Cada alerta chega com a **foto do produto**, nome, loja, preço e estoque, e tem:
+
+- **botões** "🛒 Comprar" e "🏪 Ver a loja";
+- **hashtags** da loja e do tipo (ex.: `#Whatcha #restock`). Tocando numa hashtag, você vê todos os alertas daquela loja ou daquele tipo;
+- **selo de urgência** "🔥 Só 3 unidades. Corre!" quando o estoque está baixo (limite em `urgencia_estoque`).
+
+Mudança de preço, loja fechada, avisos de erro e "esgotou" chegam **sem som**. Novidade, restock e loja aberta tocam normalmente. Se aparecerem muitos alertas de uma vez (ex.: lançamento de coleção), eles chegam agrupados em álbuns de até 10 fotos com a lista numerada.
 
 ---
 
@@ -49,10 +56,12 @@ Pronto. Na próxima rodada o monitor:
       estoque_baixo: 3                     # false, ou avisa quando cair para 3 ou menos
       preco: true                          # mudança de preço
       loja_fechada: true                   # fechou com senha / reabriu
+      esgotou: true                        # responde ao alerta quando o produto esgota
     filtros:
       incluir: [magnético, holo]           # só avisa se o nome tiver alguma dessas palavras
       excluir: [lixa, base, top coat]      # nunca avisa se o nome tiver alguma dessas palavras
     pausa_segundos: 1.5                    # pausa entre requisições nesta loja
+    hashtag: Patty                         # hashtag da loja (padrão: gerada do nome → #MinhaLoja)
     ativo: false                           # desliga a loja sem apagar a configuração
 ```
 
@@ -135,6 +144,10 @@ python -m monitor                       # roda todas as lojas (envia alertas e s
 python -m monitor run --store whatcha   # só uma loja
 python -m monitor run --dry-run         # mostra os alertas sem enviar e sem salvar nada
 python -m pytest -q                     # testes
+
+# Novidades dos últimos dias (só produtos novos: restocks passados não ficam registrados nas lojas)
+python -m monitor recentes --dias 3            # só lista
+python -m monitor recentes --dias 3 --enviar   # envia um alerta por produto, em ordem de lançamento
 ```
 
 **Simular um alerta para testar:** edite `state/<loja>.json`.
@@ -178,6 +191,8 @@ gh secret set TELEGRAM_CHAT_ID
 - **Actions fixadas por SHA**, com permissões mínimas. O token com permissão de escrita só existe no passo que faz o push do estado, não no passo que roda o monitor.
 - **Cada loja só acessa o próprio domínio**: redirecionamentos para outros sites são recusados. As respostas têm limite de 20 MB e 120 s.
 - **Textos vindos das lojas são higienizados**: nomes em uma linha só, sem caracteres de controle (evita injeção de comandos nos logs públicos do Actions), e escapados no HTML do Telegram.
+- **O bot só funciona no seu grupo.** Ele só envia para o `TELEGRAM_CHAT_ID`, não responde a comandos e não lê as conversas. Se alguém adicioná-lo a outro grupo, ele sai sozinho na rodada seguinte. Isso só acontece se ele estiver no grupo configurado; se o seu grupo virar supergrupo, ele reconhece o grupo novo como seu. Em **canais** ele não sai (pode ser o seu próprio canal sendo montado): só registra um aviso no log com o ID do canal. Para impedir até o convite, desligue no @BotFather: Bot Settings → Allow Groups → off.
+- **Grupo só de avisos:** se os membros não podem enviar mensagens, o bot precisa ser **administrador** do grupo (sem nenhuma permissão extra), senão ele também não consegue enviar.
 - **Logs públicos:** como o repositório é público, qualquer pessoa vê os logs do Actions (nomes das lojas, contagens, erros). Nada sensível é registrado ali.
 
 **Atualizar dependências manualmente:**

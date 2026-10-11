@@ -15,7 +15,8 @@ from .adapters import ADAPTERS, detect_platform
 from .config import Settings, StoreConfig
 from .diff import baseline, diff_products, select_variant_fetches
 from .fetcher import Fetcher
-from .models import STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED, Alert, clean_text, describe_counts
+from .models import (LOW_STOCK, NEW, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
+                     VARIANT_RESTOCK, Alert, clean_text, describe_counts)
 from .telegram import Telegram, caption
 
 logger = logging.getLogger("monitor")
@@ -69,7 +70,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
         out.status, out.error = "erro", str(e)
         log.error(f"falhou ({state['errors']}ª vez seguida): {e}")
         if state["errors"] == settings.error_alert_after:
-            out.alerts.append(Alert(kind=STORE_ERROR, store=store.name, store_url=store.url,
+            out.alerts.append(Alert(kind=STORE_ERROR, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
                                     note=f"{state['errors']} tentativas seguidas falharam. Último erro: {str(e)[:300]}"))
         if store.platform == "auto" and state["errors"] >= 3:
             state["platform"] = None  # tenta detectar a plataforma de novo
@@ -77,7 +78,8 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
 
     state["platform"] = platform
     if int(state.get("errors") or 0) >= settings.error_alert_after:
-        out.alerts.append(Alert(kind=STORE_RECOVERED, store=store.name, store_url=store.url))
+        out.alerts.append(Alert(kind=STORE_RECOVERED, store=store.name, store_url=store.url, store_key=store.key,
+                                store_tag=store.hashtag))
     state["errors"] = 0
     prev_status = state.get("status")
     state["status"] = out.status = scan.status
@@ -86,7 +88,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
         out.note = "fechada com senha"
         log.info("loja fechada com senha (/password)")
         if prev_status == "open" and store.alerts.store_status:
-            out.alerts.append(Alert(kind=STORE_CLOSED, store=store.name, store_url=store.url,
+            out.alerts.append(Alert(kind=STORE_CLOSED, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
                                     note="A loja foi fechada com senha. Pode ser lançamento chegando! 👀"))
         return finish()
 
@@ -96,7 +98,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
              + ("" if scan.complete else " — varredura INCOMPLETA"))
 
     if prev_status == "password" and store.alerts.store_status:
-        out.alerts.append(Alert(kind=STORE_OPEN, store=store.name, store_url=store.url,
+        out.alerts.append(Alert(kind=STORE_OPEN, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
                                 note=f"A loja reabriu com {out.available} produtos disponíveis."))
 
     if not state.get("baseline"):
@@ -155,7 +157,7 @@ def run(settings: Settings, only: Optional[str] = None, dry_run: bool = False,
     _print_summary(outcomes, len(alerts))
 
     if dry_run:
-        _print_alerts(alerts)
+        _print_alerts(alerts, settings)
     else:
         _deliver(alerts, settings, state_dir, now)
 
@@ -168,15 +170,21 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
     if pending:
         logger.info(f"reenviando {len(pending)} alerta(s) que falharam na rodada anterior")
     queue = pending + alerts
+    token, chat_id = os.environ.get("TELEGRAM_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        if queue:
+            logger.warning(f"TELEGRAM_TOKEN/TELEGRAM_CHAT_ID não configurados: {len(queue)} alerta(s) guardado(s) para depois")
+        st.save_outbox(queue[-OUTBOX_MAX_SIZE:], state_dir)
+        return
+    tg = Telegram(token, chat_id, urgent_stock=settings.urgent_stock)
+    try:  # o bot só funciona no grupo configurado: sai de qualquer outro
+        for chat in tg.leave_foreign_chats():
+            logger.warning(f"o bot foi adicionado a outro chat e saiu: {clean_text(chat)}")
+    except Exception as e:
+        logger.warning(f"verificação de chats do Telegram falhou: {tg.redact(str(e))}")
     if not queue:
         st.save_outbox([], state_dir)
         return
-    token, chat_id = os.environ.get("TELEGRAM_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
-        logger.warning(f"TELEGRAM_TOKEN/TELEGRAM_CHAT_ID não configurados: {len(queue)} alerta(s) guardado(s) para depois")
-        st.save_outbox(queue[-OUTBOX_MAX_SIZE:], state_dir)
-        return
-    tg = Telegram(token, chat_id)
     try:
         failed = tg.send_alerts(queue, settings.max_individual_alerts)
     except Exception as e:  # nunca perder os alertas por um erro inesperado
@@ -187,6 +195,28 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
     else:
         logger.info(f"{len(queue)} alerta(s) enviado(s) ao Telegram")
     st.save_outbox(failed[-OUTBOX_MAX_SIZE:], state_dir)
+    _remember_messages([a for a in queue if a not in failed], state_dir, now)
+
+
+ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, LOW_STOCK}
+
+
+def _remember_messages(sent: List[Alert], state_dir: Path, now: datetime):
+    """Guarda no estado qual mensagem anunciou cada produto, para responder \"⚡ esgotou\" depois."""
+    by_store: dict = {}
+    for a in sent:
+        if a.kind in ANNOUNCE_KINDS and a.available and a.message_id and a.store_key and a.product_id:
+            by_store.setdefault(a.store_key, []).append(a)
+    for key, items in by_store.items():
+        state = st.load(key, state_dir)
+        for a in items:
+            rec = (state.get("products") or {}).get(a.product_id)
+            if rec is None or not rec.get("available"):
+                continue
+            if a.kind == LOW_STOCK and rec.get("alert"):
+                continue  # "esgotou" responde ao anúncio original (novidade/restock), não ao "últimas unidades"
+            rec["alert"] = {"msg": a.message_id, "at": now.isoformat(timespec="seconds")}
+        st.save(key, state, state_dir)
 
 
 def _recent(a: Alert, now: datetime) -> bool:
@@ -218,14 +248,14 @@ def _print_summary(outcomes: List[Outcome], n_alerts: int):
             f.write(f"### Polish Watcher — {n_alerts} alerta(s)\n\n" + "\n".join(rows) + "\n")
 
 
-def _print_alerts(alerts: List[Alert]):
+def _print_alerts(alerts: List[Alert], settings: Settings):
     if not alerts:
         logger.info("[dry-run] nenhum alerta")
         return
     logger.info(f"[dry-run] {len(alerts)} alerta(s) que seriam enviados:")
     for a in alerts:
         print("-" * 60)
-        print(caption(a))
+        print(caption(a, settings.urgent_stock))
         if a.image:
             print(f"(foto: {a.image})")
     print("-" * 60)
