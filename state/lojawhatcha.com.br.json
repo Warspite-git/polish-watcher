@@ -477,7 +477,7 @@
     "288006994": {"name": "Cake Clouds", "price": 65.0, "available": true, "stock": 25, "url": "https://www.lojawhatcha.com.br/produtos/cake-clouds/", "first_seen": "2026-10-11"},
     "288007414": {"name": "Disco Cracks", "price": 65.0, "available": true, "stock": 7, "url": "https://www.lojawhatcha.com.br/produtos/disco-cracks/", "first_seen": "2026-10-11"},
     "288007635": {"name": "Festive Fern", "price": 65.0, "available": true, "stock": 12, "url": "https://www.lojawhatcha.com.br/produtos/festive-fern/", "first_seen": "2026-10-11"},
-    "288008239": {"name": "Gala Rouge", "price": 65.0, "available": true, "stock": 14, "url": "https://www.lojawhatcha.com.br/produtos/gala-rouge/", "first_seen": "2026-10-11"},
+    "288008239": {"name": "Gala Rouge", "price": 65.0, "available": true, "stock": 13, "url": "https://www.lojawhatcha.com.br/produtos/gala-rouge/", "first_seen": "2026-10-11"},
     "288008638": {"name": "Holoversary", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/holoversary/", "first_seen": "2026-10-11"},
     "288008985": {"name": "Lava Lights", "price": 65.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/lava-lights/", "first_seen": "2026-10-11"},
     "288009178": {"name": "Lavender Partycake", "price": 65.0, "available": true, "stock": 31, "url": "https://www.lojawhatcha.com.br/produtos/lavender-partycake/", "first_seen": "2026-10-11"},
@@ -583,7 +583,7 @@
     "361387176": {"name": "Against the Odds", "price": 65.0, "available": true, "stock": 13, "url": "https://www.lojawhatcha.com.br/produtos/against-the-odds-1l7eq/", "first_seen": "2026-10-11"},
     "361387638": {"name": "Serendipity", "price": 65.0, "available": true, "stock": 22, "url": "https://www.lojawhatcha.com.br/produtos/serendipity-n5lfd/", "first_seen": "2026-10-11"},
     "361387947": {"name": "By Chance", "price": 65.0, "available": true, "stock": 39, "url": "https://www.lojawhatcha.com.br/produtos/by-chance-1ifq4/", "first_seen": "2026-10-11"},
-    "361388270": {"name": "Stroke of Luck", "price": 65.0, "available": true, "stock": 10, "url": "https://www.lojawhatcha.com.br/produtos/stroke-of-luck-4equf/", "first_seen": "2026-10-11"},
+    "361388270": {"name": "Stroke of Luck", "price": 65.0, "available": true, "stock": 9, "url": "https://www.lojawhatcha.com.br/produtos/stroke-of-luck-4equf/", "first_seen": "2026-10-11"},
     "361388512": {"name": "Finges Crossed", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/finges-crossed-1f0fu/", "first_seen": "2026-10-11"},
     "361388669": {"name": "Luck of the Draw", "price": 65.0, "available": true, "stock": 17, "url": "https://www.lojawhatcha.com.br/produtos/luck-of-the-draw-1hcb1/", "first_seen": "2026-10-11"},
     "361388938": {"name": "Begginer's Luck", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/begginers-luck-1qdpg/", "first_seen": "2026-10-11"},
@@ -622,6 +622,6 @@
     "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 36, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
     "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 50, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
-    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 59, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
+    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 58, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
   }
 }
