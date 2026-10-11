@@ -2,8 +2,8 @@ from monitor.adapters.shopify import parse_product
 
 RAW = {
     "id": 7179451531453,
-    "title": "Suspension Base",
-    "handle": "suspension-base",
+    "title": "Base de Teste",
+    "handle": "base-de-teste",
     "images": [{"src": "https://cdn.shopify.com/s/files/1/base.jpg?v=1"}],
     "variants": [
         {"id": 1, "title": "100 ml", "available": False, "price": "89.90"},
@@ -13,9 +13,9 @@ RAW = {
 
 
 def test_parse_product():
-    p = parse_product(RAW, "https://www.drknails.com")
+    p = parse_product(RAW, "https://loja-shopify.test")
     assert p.id == "7179451531453"
-    assert p.url == "https://www.drknails.com/products/suspension-base"
+    assert p.url == "https://loja-shopify.test/products/base-de-teste"
     assert p.image == "https://cdn.shopify.com/s/files/1/base.jpg?v=1&width=800"
     assert p.available
     assert p.price == 39.9  # menor preço entre as variantes disponíveis
