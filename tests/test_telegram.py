@@ -241,3 +241,13 @@ def test_message_ids_are_recorded():
     group = [alert(i) for i in range(3)]
     tg.send_album(group, "h")
     assert [a.message_id for a in group] == [1, 2, 3]
+
+
+def test_replenish_caption():
+    a = alert(kind="replenish")
+    a.old_stock, a.stock = 3, 30
+    text = caption(a)
+    assert text.startswith("📦 <b>REPOSIÇÃO</b> · Loja")
+    assert "💰 R$ 65,00 · 📦 3 → 30 unidades (+27)" in text
+    assert text.endswith("#Loja #reposicao")
+    assert [b["text"] for b in buttons(a)["inline_keyboard"][0]] == ["🛒 Comprar", "🏪 Ver a loja"]

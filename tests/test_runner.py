@@ -154,3 +154,12 @@ def test_collect_recent_reports_incomplete_stores(env):
     problems = []
     alerts = collect_recent(settings, 3, now=NOW, problems=problems)
     assert len(alerts) == 1 and problems == ["Fake: leitura incompleta"]
+
+
+def test_sites_yaml_replenish_option():
+    from monitor.config import ConfigError, _parse_threshold
+    assert all(s.alerts.replenish == 5 for s in load_settings("sites.yaml").stores)
+    assert _parse_threshold(False, "reposicao", 5) is None and _parse_threshold(True, "reposicao", 5) == 5
+    assert _parse_threshold(10, "reposicao", 5) == 10
+    with pytest.raises(ConfigError):
+        _parse_threshold("muito", "reposicao", 5)

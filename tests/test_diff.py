@@ -172,3 +172,34 @@ def test_hidden_product_counts_as_sold_out():
     alerts, state = diff_products(store(), state, scan(prod("1")), NOW)  # sumiu 2 vezes
     assert [(a.kind, a.reply_to, a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2")]
     assert "alert" not in state["2"] and state["2"]["available"] is False
+
+
+# ------------------------------------------------------------ reposição
+
+def test_replenish_when_stock_grows_without_selling_out():
+    old = baseline(scan(prod("1", stock=3)), NOW)
+    alerts, _ = diff_products(store(replenish=5), old, scan(prod("1", stock=30)), NOW)
+    assert [(a.kind, a.old_stock, a.stock) for a in alerts] == [("replenish", 3, 30)]
+
+
+def test_replenish_respects_minimum_and_switch():
+    old = baseline(scan(prod("1", stock=3)), NOW)
+    assert diff_products(store(replenish=5), old, scan(prod("1", stock=7)), NOW)[0] == []   # +4 < 5
+    assert diff_products(store(replenish=5), old, scan(prod("1", stock=8)), NOW)[0][0].kind == "replenish"  # +5
+    assert diff_products(store(), old, scan(prod("1", stock=30)), NOW)[0] == []  # desligado
+
+
+def test_sold_out_then_back_is_restock_not_replenish():
+    old = baseline(scan(prod("1", available=False, stock=0)), NOW)
+    alerts, _ = diff_products(store(replenish=5), old, scan(prod("1", stock=30)), NOW)
+    assert [a.kind for a in alerts] == ["restock"]
+
+
+def test_no_replenish_without_stock_count_or_with_variant_restock():
+    old = baseline(scan(prod("1", stock=None)), NOW)
+    assert diff_products(store(replenish=5), old, scan(prod("1", stock=None)), NOW)[0] == []
+    v_old = {"10": Variant("10", "Mini", False, 0), "11": Variant("11", "Full", True, 5)}
+    v_new = {"10": Variant("10", "Mini", True, 20), "11": Variant("11", "Full", True, 5)}
+    old = baseline(scan(prod("2", stock=5, variants=v_old)), NOW)
+    alerts, _ = diff_products(store(replenish=5), old, scan(prod("2", stock=25, variants=v_new)), NOW)
+    assert [a.kind for a in alerts] == ["variant_restock"]  # não duplica com reposição

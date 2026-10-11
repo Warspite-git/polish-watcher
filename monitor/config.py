@@ -21,6 +21,7 @@ class AlertConfig:
     new: bool = True
     restock: bool = True
     low_stock: Optional[int] = None  # limite; None = desligado
+    replenish: Optional[int] = None  # mínimo de unidades novas para avisar reposição; None = desligado
     price_change: bool = False
     store_status: bool = True
     sold_out: bool = True  # responde ao alerta quando o produto esgota
@@ -77,15 +78,16 @@ def normalize_url(raw: str):
     return base, key
 
 
-def _parse_low_stock(value) -> Optional[int]:
+def _parse_threshold(value, key: str, default_if_true: int) -> Optional[int]:
+    """false/None → desligado; true → valor padrão; número → o próprio número."""
     if value is None or value is False:
         return None
     if value is True:
-        return 3
+        return default_if_true
     try:
         n = int(value)
     except (TypeError, ValueError):
-        raise ConfigError(f"estoque_baixo deve ser false ou um número, recebi {value!r}")
+        raise ConfigError(f"{key} deve ser false ou um número, recebi {value!r}")
     return n if n > 0 else None
 
 
@@ -94,7 +96,8 @@ def _alerts(raw: dict, base: AlertConfig) -> AlertConfig:
     return AlertConfig(
         new=bool(raw.get("novos", base.new)),
         restock=bool(raw.get("restock", base.restock)),
-        low_stock=_parse_low_stock(raw["estoque_baixo"]) if "estoque_baixo" in raw else base.low_stock,
+        low_stock=_parse_threshold(raw["estoque_baixo"], "estoque_baixo", 3) if "estoque_baixo" in raw else base.low_stock,
+        replenish=_parse_threshold(raw["reposicao"], "reposicao", 5) if "reposicao" in raw else base.replenish,
         price_change=bool(raw.get("preco", base.price_change)),
         store_status=bool(raw.get("loja_fechada", base.store_status)),
         sold_out=bool(raw.get("esgotou", base.sold_out)),

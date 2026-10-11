@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from .config import StoreConfig
-from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, SOLD_OUT, VARIANT_RESTOCK, Alert, Product,
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, SOLD_OUT, VARIANT_RESTOCK, Alert, Product,
                      ScanResult, Variant)
 
 # Produto some da listagem em N varreduras completas seguidas → tratado como indisponível
@@ -104,6 +104,7 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
         was_available = bool(prev.get("available"))
         old_stock = prev.get("stock")
 
+        variant_back = False
         if not was_available and p.available:
             if cfg.restock:
                 note = "Voltou ao catálogo da loja" if prev.get("missing") else ""
@@ -114,6 +115,13 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
                     if v.available and (vid not in old_vars or not old_vars[vid].get("available"))]
             if back:
                 alerts.append(_alert(VARIANT_RESTOCK, store, p, variants=[_variant_label(v) for v in back]))
+                variant_back = True
+
+        # Reposição: chegaram mais unidades num produto que não chegou a esgotar (ex.: 3 → 30)
+        if (cfg.replenish and was_available and p.available and not variant_back
+                and isinstance(p.stock, int) and isinstance(old_stock, int)
+                and p.stock - old_stock >= cfg.replenish):
+            alerts.append(_alert(REPLENISH, store, p, old_stock=old_stock))
 
         if was_available and not p.available and cfg.sold_out:
             note = sold_out_note(prev.get("alert"), now)

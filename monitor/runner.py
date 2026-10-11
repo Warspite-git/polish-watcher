@@ -15,7 +15,7 @@ from .adapters import ADAPTERS, detect_platform
 from .config import Settings, StoreConfig
 from .diff import baseline, diff_products, select_variant_fetches
 from .fetcher import Fetcher
-from .models import (LOW_STOCK, NEW, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
+from .models import (LOW_STOCK, NEW, REPLENISH, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
                      VARIANT_RESTOCK, Alert, clean_text, describe_counts)
 from .telegram import Telegram, caption
 
@@ -199,7 +199,7 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
     _remember_messages([a for a in queue if a not in failed and a.store_key in wants_sold_out], state_dir, now)
 
 
-ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, LOW_STOCK}
+ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK}
 
 
 def _remember_messages(sent: List[Alert], state_dir: Path, now: datetime):

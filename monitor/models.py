@@ -48,6 +48,7 @@ class ScanResult:
 NEW = "new"
 RESTOCK = "restock"
 VARIANT_RESTOCK = "variant_restock"
+REPLENISH = "replenish"  # reposição: mais unidades num produto que não chegou a esgotar
 LOW_STOCK = "low_stock"
 PRICE = "price"
 SOLD_OUT = "sold_out"  # resposta "⚡ esgotou" ao alerta que anunciou o produto
@@ -63,6 +64,7 @@ LABELS = {
     NEW: "novo(s)",
     RESTOCK: "restock(s)",
     VARIANT_RESTOCK: "restock(s) de variante",
+    REPLENISH: "reposição(ões)",
     LOW_STOCK: "estoque baixo",
     PRICE: "mudança(s) de preço",
     SOLD_OUT: "esgotado(s)",
@@ -90,6 +92,7 @@ class Alert:
     image: Optional[str] = None
     price: Optional[float] = None
     old_price: Optional[float] = None
+    old_stock: Optional[int] = None
     stock: Optional[int] = None
     available: bool = True
     variants: List[str] = field(default_factory=list)

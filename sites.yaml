@@ -12,6 +12,7 @@ padrao:
   alertas:
     novos: true             # produto novo no catálogo
     restock: true           # produto/variante voltou ao estoque
+    reposicao: 5            # chegaram N+ unidades num produto que não tinha esgotado (false desliga)
     estoque_baixo: false    # false ou um número (ex.: 3 → avisa quando cair para 3 ou menos)
     preco: false            # mudança de preço
     loja_fechada: true      # loja fechou com senha / reabriu (lançamentos, reformas)

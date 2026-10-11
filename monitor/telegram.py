@@ -12,7 +12,7 @@ from typing import Dict, List, Optional
 import requests
 
 from .fetcher import user_agent
-from .models import (LOW_STOCK, NEW, PRICE, RESTOCK, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
                      STORE_RECOVERED, VARIANT_RESTOCK, Alert, clean_text)
 
 API = "https://api.telegram.org"
@@ -27,6 +27,7 @@ TITLES = {
     NEW: "🆕 <b>NOVIDADE</b>",
     RESTOCK: "🚨 <b>RESTOCK</b>",
     VARIANT_RESTOCK: "🚨 <b>RESTOCK DE VARIANTE</b>",
+    REPLENISH: "📦 <b>REPOSIÇÃO</b>",
     LOW_STOCK: "⏳ <b>ÚLTIMAS UNIDADES</b>",
     PRICE: "🏷️ <b>PREÇO MUDOU</b>",
     SOLD_OUT: "⚡ <b>ESGOTOU</b>",
@@ -35,17 +36,19 @@ TITLES = {
     STORE_ERROR: "⚠️ <b>NÃO ESTOU CONSEGUINDO LER A LOJA</b>",
     STORE_RECOVERED: "🔧 <b>VOLTEI A LER A LOJA</b>",
 }
-ICONS = {NEW: "🆕", RESTOCK: "🚨", VARIANT_RESTOCK: "🚨", LOW_STOCK: "⏳", PRICE: "🏷️", SOLD_OUT: "⚡"}
+ICONS = {NEW: "🆕", RESTOCK: "🚨", VARIANT_RESTOCK: "🚨", REPLENISH: "📦", LOW_STOCK: "⏳", PRICE: "🏷️",
+         SOLD_OUT: "⚡"}
 # Hashtags por tipo: tocando nelas, o membro filtra o histórico do grupo
 TYPE_TAGS = {
-    NEW: "#novidade", RESTOCK: "#restock", VARIANT_RESTOCK: "#restock", LOW_STOCK: "#ultimasunidades",
+    NEW: "#novidade", RESTOCK: "#restock", VARIANT_RESTOCK: "#restock", REPLENISH: "#reposicao",
+    LOW_STOCK: "#ultimasunidades",
     PRICE: "#preco", SOLD_OUT: "#esgotou", STORE_OPEN: "#lojaaberta", STORE_CLOSED: "#lojafechada",
     STORE_ERROR: "#aviso", STORE_RECOVERED: "#aviso",
 }
 # Avisos menos urgentes chegam sem som. "Loja aberta", novidades e restocks tocam.
 SILENT = {PRICE, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_RECOVERED}
-URGENT_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, LOW_STOCK}
-KIND_ORDER = {RESTOCK: 0, VARIANT_RESTOCK: 1, NEW: 2, LOW_STOCK: 3, PRICE: 4}
+URGENT_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK}
+KIND_ORDER = {RESTOCK: 0, VARIANT_RESTOCK: 1, NEW: 2, REPLENISH: 3, LOW_STOCK: 4, PRICE: 5}
 
 
 class TelegramError(Exception):
@@ -119,7 +122,10 @@ def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False) -> str:
         price = f"💰 <s>{brl(a.old_price)}</s> → <b>{brl(a.price)}</b>"
     else:
         price = f"💰 {brl(a.price)}" if a.price is not None else ""
-    if is_urgent(a, urgent_stock):
+    if a.kind == REPLENISH and a.old_stock is not None and isinstance(a.stock, int):
+        lines.append(" · ".join(x for x in (
+            price, f"📦 {a.old_stock} → {a.stock} unidades (+{a.stock - a.old_stock})") if x))
+    elif is_urgent(a, urgent_stock):
         lines.append(price)
         lines.append("🔥 Última unidade. Corre!" if a.stock == 1 else f"🔥 Só {a.stock} unidades. Corre!")
     else:

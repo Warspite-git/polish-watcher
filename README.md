@@ -8,6 +8,7 @@ O monitor lê o catálogo **inteiro** de cada loja e avisa quando:
 |---|---|---|
 | 🆕 NOVIDADE | apareceu um produto que não existia | ligado |
 | 🚨 RESTOCK | produto (ou variante) passou de esgotado para disponível | ligado |
+| 📦 REPOSIÇÃO | chegaram mais unidades num produto que **não** tinha esgotado (ex.: 3 → 30), a partir do mínimo configurado | ligado (5+ unidades) |
 | ⚡ Esgotou | um produto anunciado esgotou (até 48h depois): o bot **responde ao alerta original** dizendo em quanto tempo | desligado |
 | 🔓 / 🔒 Loja aberta / fechada | a loja reabriu ou fechou com senha (lançamento, reforma) | ligado |
 | ⏳ ÚLTIMAS UNIDADES | o estoque caiu para o limite que você escolheu (ex.: 3) | desligado |
@@ -53,6 +54,7 @@ Pronto. Na próxima rodada o monitor:
     alertas:
       novos: true                          # produto novo
       restock: true                        # voltou ao estoque
+      reposicao: 5                         # false, ou avisa quando chegarem 5+ unidades sem ter esgotado
       estoque_baixo: 3                     # false, ou avisa quando cair para 3 ou menos
       preco: true                          # mudança de preço
       loja_fechada: true                   # fechou com senha / reabriu
