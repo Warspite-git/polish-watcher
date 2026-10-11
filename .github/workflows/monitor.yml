@@ -2,7 +2,8 @@ name: Monitor de estoque
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # a cada 15 min (o GitHub pode atrasar em horários de pico)
+    # a cada 15 min, fora do início da hora (pico do GitHub, quando agendamentos atrasam ou somem)
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
     inputs:
       loja:

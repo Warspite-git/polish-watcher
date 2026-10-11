@@ -146,11 +146,17 @@ def cmd_recentes(args) -> int:
     except ConfigError as e:
         logging.error(f"sites.yaml: {e}")
         return 2
-    alerts = collect_recent(settings, args.dias, only=args.store, available_only=args.disponiveis)
+    problems: list = []
+    alerts = collect_recent(settings, args.dias, only=args.store, available_only=args.disponiveis, problems=problems)
     dias = int(args.dias) if float(args.dias).is_integer() else args.dias
     print(f"\n{len(alerts)} produto(s) adicionados nos últimos {dias} dia(s), do mais antigo ao mais novo:")
     for a in alerts:
         print(f"  {a.note.replace('🗓️ Adicionado em ', ''):18} {a.store:20} {a.name[:45]:45} {stock_text(a)}")
+    if problems:
+        print("\n⚠️  Lista possivelmente incompleta:\n  " + "\n  ".join(problems))
+        if args.enviar and not args.forcar:
+            print("Nada foi enviado. Rode de novo (a instabilidade costuma passar) ou use --forcar.")
+            return 1
     if not args.enviar or not alerts:
         if alerts:
             print("\n(nada enviado; use --enviar para mandar ao Telegram)")
@@ -209,6 +215,7 @@ def main(argv=None) -> int:
     rec.add_argument("--disponiveis", action="store_true", help="só produtos disponíveis")
     rec.add_argument("--enviar", action="store_true", help="envia um alerta por produto ao Telegram")
     rec.add_argument("--intervalo", type=float, default=3.5, help="segundos entre mensagens (padrão 3.5)")
+    rec.add_argument("--forcar", action="store_true", help="envia mesmo se alguma loja foi lida de forma incompleta")
     det = sub.add_parser("detect", help="detecta a plataforma de uma loja")
     det.add_argument("url")
 

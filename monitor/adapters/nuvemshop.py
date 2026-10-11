@@ -23,6 +23,7 @@ from ..models import Product, ScanResult, Variant, clean_text
 from .base import Adapter, AdapterError
 
 MAX_PAGES = 300
+SIZE_RETRIES = 2  # novas leituras quando o servidor muda o tamanho das páginas no meio
 
 ITEM_RE = re.compile(r'data-product-id="(\d+)"')
 LD_RE = re.compile(r"<script[^>]*application/ld\+json[^>]*structured-data\.item[^>]*>(.*?)</script>", re.S)
@@ -52,6 +53,21 @@ class NuvemshopAdapter(Adapter):
         return f"{self.store.url}{path}?results_only=true&sort_by=created-ascending"
 
     def scan(self) -> ScanResult:
+        """Lê a listagem inteira. Se o servidor mudar o tamanho das páginas no meio da leitura
+        (cache instável), produtos podem escorregar entre páginas: lê de novo e junta tudo."""
+        result, sizes_ok = self._scan_once()
+        attempt = 0
+        while result.status == "open" and not sizes_ok and attempt < SIZE_RETRIES:
+            attempt += 1
+            self.log.info(f"lendo a listagem de novo ({attempt}ª repetição) por causa da variação nas páginas")
+            again, sizes_ok = self._scan_once()
+            if again.status != "open":
+                return again
+            result = ScanResult(status="open", products={**result.products, **again.products},
+                                complete=again.complete)
+        return result
+
+    def _scan_once(self) -> Tuple[ScanResult, bool]:
         products: Dict[str, Product] = {}
         complete = True
         sizes: List[int] = []
@@ -65,7 +81,7 @@ class NuvemshopAdapter(Adapter):
                 complete = False
                 break
             if is_password_page(resp.url):
-                return ScanResult(status="password")
+                return ScanResult(status="password"), True
             items, errors = parse_listing(resp.text)
             if errors:
                 self.log.warning(f"página {page}: {errors} produto(s) com JSON ilegível; varredura incompleta")
@@ -85,12 +101,13 @@ class NuvemshopAdapter(Adapter):
         else:
             self.log.warning(f"parou no limite de {MAX_PAGES} páginas; varredura incompleta")
             complete = False
-        if not consistent_page_sizes(sizes):
+        sizes_ok = consistent_page_sizes(sizes)
+        if not sizes_ok:
             # Já vimos o servidor trocar de 50 para 9 itens por página entre respostas
             # (cache). Se isso acontece no meio da varredura, produtos podem ser pulados.
             self.log.warning(f"tamanho das páginas variou ({sizes}); varredura incompleta")
             complete = False
-        return ScanResult(status="open", products=products, complete=complete)
+        return ScanResult(status="open", products=products, complete=complete), sizes_ok
 
     def fetch_variants(self, product_id: str, url: str) -> Optional[Dict[str, Variant]]:
         resp = self.fetcher.get(url)

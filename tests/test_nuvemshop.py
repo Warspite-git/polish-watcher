@@ -159,3 +159,25 @@ def test_image_upload_date():
     assert image_upload_date(url) == "2026-10-10T17:40:18+00:00"
     assert image_upload_date("https://x.test/tmp/foto.jpg") is None
     assert image_upload_date(None) is None
+
+
+class FlakyFetcher(FakeFetcher):
+    """Cada leitura completa (a partir da página 1) usa a próxima configuração de páginas."""
+    def __init__(self, attempts):
+        super().__init__(attempts[0])
+        self.attempts, self.n = attempts, -1
+
+    def get(self, url):
+        if "/page/" not in url:
+            self.n += 1
+            self.pages = self.attempts[min(self.n, len(self.attempts) - 1)]
+        return super().get(url)
+
+
+def test_scan_rereads_when_page_size_changes_mid_scan():
+    # 1ª leitura: o servidor muda de 9 para 12 itens por página (produtos escorregam);
+    # 2ª leitura: estável → completa
+    f = FlakyFetcher([[9, 9, 12, 12, 3], [12, 12, 12, 9]])
+    res = adapter(f).scan()
+    assert res.complete and f.n == 1
+    assert {str(i) for i in range(45)} <= set(res.products)

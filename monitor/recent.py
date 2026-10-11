@@ -22,12 +22,14 @@ BR = ZoneInfo("America/Sao_Paulo")
 logger = logging.getLogger("monitor")
 
 
-def _store_products(store: StoreConfig) -> List[Product]:
+def _store_products(store: StoreConfig, problems: Optional[list] = None) -> List[Product]:
     fetcher = Fetcher(delay=store.delay, allowed_host=store.key)
     platform = store.platform
     if platform == "auto":
         platform = st.load(store.key).get("platform") or detect_platform(fetcher, store.url)
     scan = ADAPTERS[platform](store, fetcher).scan()
+    if not scan.complete and problems is not None:
+        problems.append(f"{store.name}: leitura incompleta")
     if scan.status != "open":
         logger.info(f"[{store.name}] loja fechada com senha; pulando")
         return []
@@ -35,8 +37,11 @@ def _store_products(store: StoreConfig) -> List[Product]:
 
 
 def collect_recent(settings: Settings, days: float, now: Optional[datetime] = None, only: Optional[str] = None,
-                   available_only: bool = False) -> List[Alert]:
-    """Alertas de "produto novo" para o que entrou nos últimos `days` dias, do mais antigo ao mais novo."""
+                   available_only: bool = False, problems: Optional[list] = None) -> List[Alert]:
+    """Alertas de "produto novo" para o que entrou nos últimos `days` dias, do mais antigo ao mais novo.
+
+    Lojas com leitura incompleta ou com erro são anotadas em `problems` (se informado).
+    """
     now = now or datetime.now(timezone.utc)
     cutoff = now - timedelta(days=days)
     stores = [s for s in settings.stores if s.enabled]
@@ -46,9 +51,11 @@ def collect_recent(settings: Settings, days: float, now: Optional[datetime] = No
 
     def work(store):
         try:
-            return store, _store_products(store)
+            return store, _store_products(store, problems)
         except Exception as e:  # uma loja com problema não impede as outras
             logger.error(f"[{store.name}] falhou: {e}")
+            if problems is not None:
+                problems.append(f"{store.name}: erro ({e})")
             return store, []
 
     with ThreadPoolExecutor(max_workers=max(1, min(8, len(stores)))) as pool:

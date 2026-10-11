@@ -144,3 +144,13 @@ def test_announced_products_remember_message_and_get_sold_out_reply(env, monkeyp
     assert method == "sendMessage" and "Esgotou em menos de 15 minutos" in data["text"]
     assert '"message_id": 555' in data["reply_parameters"]
     assert "alert" not in st.load("f.test", state_dir)["products"]["1"]
+
+
+def test_collect_recent_reports_incomplete_stores(env):
+    from monitor.recent import collect_recent
+    settings, _ = env
+    FakeAdapter.script = [ScanResult(status="open", complete=False, products={
+        "a": Product(id="a", name="A", url="https://f.test/a", added_at="2026-10-10T12:00:00+00:00")})]
+    problems = []
+    alerts = collect_recent(settings, 3, now=NOW, problems=problems)
+    assert len(alerts) == 1 and problems == ["Fake: leitura incompleta"]
