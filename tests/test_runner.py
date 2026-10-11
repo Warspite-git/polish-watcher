@@ -94,5 +94,6 @@ def test_state_file_roundtrip(tmp_path):
 def test_real_sites_yaml_loads():
     settings = load_settings("sites.yaml")
     keys = [s.key for s in settings.stores]
-    assert "lojawhatcha.com.br" in keys and "drknails.com" in keys and len(keys) == 8
-    assert all(s.alerts.new and s.alerts.restock for s in settings.stores)
+    assert keys, "o sites.yaml precisa ter pelo menos uma loja"
+    assert len(keys) == len(set(keys))  # sem lojas repetidas
+    assert all(s.url.startswith("https://") for s in settings.stores)

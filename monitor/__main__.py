@@ -107,7 +107,7 @@ def cmd_test_telegram(args) -> int:
         tg.send_text("✅ <b>Polish Watcher conectado!</b>\nOs alertas de restock e produtos novos chegarão aqui.")
         sample = _sample_alert(args.config)
         if sample:
-            sample.note = "(exemplo: produto real, restock simulado)"
+            sample.note = "🧪 TESTE: este alerta é só um exemplo de formato. O produto existe na loja, mas NÃO voltou ao estoque agora."
             tg.send_alert(sample)
     except TelegramError as e:
         print(f"Falhou: {e}")
