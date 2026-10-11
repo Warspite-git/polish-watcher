@@ -1,0 +1,19 @@
+# Abre PRs mensais atualizando dependências Python (com hashes) e as actions fixadas por SHA.
+# Os testes rodam em cada PR; é só revisar e dar merge.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]

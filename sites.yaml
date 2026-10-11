@@ -1,0 +1,66 @@
+# =====================================================================
+#  Polish Watcher — lojas monitoradas
+#  Para adicionar uma loja, basta incluir um item em "lojas" no final.
+#  O README.md explica cada opção em detalhes.
+# =====================================================================
+
+# Valores padrão para TODAS as lojas. Cada loja pode sobrescrever
+# qualquer um deles (veja os exemplos comentados lá embaixo).
+padrao:
+  plataforma: auto          # auto | nuvemshop | shopify
+  pausa_segundos: 1.5       # pausa entre requisições na mesma loja
+  alertas:
+    novos: true             # produto novo no catálogo
+    restock: true           # produto/variante voltou ao estoque
+    estoque_baixo: false    # false ou um número (ex.: 3 → avisa quando cair para 3 ou menos)
+    preco: false            # mudança de preço
+    loja_fechada: true      # loja fechou com senha / reabriu (lançamentos, reformas)
+  filtros:
+    incluir: []             # se tiver algo, só avisa de produtos com alguma dessas palavras
+    excluir: []             # nunca avisa de produtos com alguma dessas palavras
+
+telegram:
+  max_alertas_individuais: 10   # acima disso na mesma rodada, agrupa em álbuns
+
+avancado:
+  falhas_para_avisar: 8         # avisa no Telegram após N rodadas seguidas com erro (~2h)
+  max_paginas_produto: 15       # máx. de páginas de produto abertas por loja por rodada
+
+lojas:
+  - nome: By Dany Vianna
+    url: https://www.bydanyvianna.com.br/
+
+  - nome: DRK
+    url: https://www.drknails.com/
+
+  - nome: Elbe
+    url: https://www.elbepolish.com.br/
+
+  - nome: Indie by Patty Lopes
+    url: https://www.indiebypattylopes.com.br/
+
+  - nome: Nothing Basic
+    url: https://nothingbasicstore.com/
+
+  - nome: Penelope Luz
+    url: https://www.penelopeluzloja.com.br/
+
+  - nome: Pepper Polish
+    url: https://www.pepperpolishloja.com.br/
+
+  - nome: Whatcha
+    url: https://www.lojawhatcha.com.br/
+
+  # ------------------------------------------------------------------
+  # Exemplo de loja com opções próprias (remova o "#" para usar):
+  #
+  # - nome: Minha Loja
+  #   url: https://www.minhaloja.com.br/
+  #   plataforma: nuvemshop
+  #   alertas:
+  #     estoque_baixo: 3
+  #     preco: true
+  #   filtros:
+  #     incluir: [magnético, holo]
+  #     excluir: [lixa, base, top coat]
+  #   ativo: false            # desliga a loja sem apagar a configuração

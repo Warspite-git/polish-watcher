@@ -1,0 +1,79 @@
+name: Monitor de estoque
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # a cada 15 min (o GitHub pode atrasar em horários de pico)
+  workflow_dispatch:
+    inputs:
+      loja:
+        description: "Rodar só esta loja (parte do nome ou domínio). Vazio = todas"
+        required: false
+        default: ""
+      dry_run:
+        description: "Só mostrar os alertas no log, sem enviar nem salvar"
+        type: boolean
+        default: false
+
+permissions: {}   # nada por padrão; o job abaixo pede só o necessário
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # só para commitar o estado
+    steps:
+      # Actions fixadas por SHA (o Dependabot atualiza). persist-credentials: false
+      # impede que o token de escrita fique no .git/config, ao alcance do monitor
+      # e das dependências: ele só aparece no último passo, para o push.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Instalar dependências (versões fixas, verificadas por hash)
+        run: pip install --require-hashes -r requirements.txt
+
+      - name: Rodar o monitor
+        id: monitor
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LOJA: ${{ inputs.loja }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          args=()
+          if [ -n "$LOJA" ]; then args+=(--store "$LOJA"); fi
+          if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          python -m monitor run "${args[@]}"
+
+      - name: Salvar estado no repositório
+        if: always() && steps.monitor.conclusion != 'skipped'
+        env:
+          SUMMARY: ${{ steps.monitor.outputs.summary }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state
+          if git diff --cached --quiet; then
+            echo "Estado sem mudanças."
+            exit 0
+          fi
+          git commit -q -m "estado: ${SUMMARY:-atualizado}"
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          for i in 1 2 3; do
+            git pull -q --rebase "$remote" "$GITHUB_REF_NAME" && git push -q "$remote" "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep $((i * 5))
+          done
+          echo "::error::Não consegui enviar o estado para o repositório"
+          exit 1

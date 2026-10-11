@@ -1,0 +1,11 @@
+# Segredos locais — NUNCA commitar
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Sistema
+.DS_Store
