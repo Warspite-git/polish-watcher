@@ -621,7 +621,7 @@
     "373449500": {"name": "Mossbound Cloister", "price": 65.0, "available": true, "stock": 36, "url": "https://www.lojawhatcha.com.br/produtos/mossbound-cloister-9d8qp/", "first_seen": "2026-10-11"},
     "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 36, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
-    "373486397": {"name": "Mischief Month", "price": 0.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11"},
+    "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 50, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
     "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 59, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
   }
 }
