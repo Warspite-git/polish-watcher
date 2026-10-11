@@ -60,8 +60,6 @@ class TelegramError(Exception):
 def brl(value: Optional[float]) -> str:
     if value is None:
         return "—"
-    if value == 0:
-        return "grátis"
     s = f"{value:,.2f}"
     return "R$ " + s.replace(",", "_").replace(".", ",").replace("_", ".")
 
@@ -85,8 +83,22 @@ def hashtag(text: str) -> str:
 
 
 def tags(a: Alert) -> str:
-    store = hashtag(a.store_tag) if a.store_tag else hashtag(a.store)
-    return " ".join(t for t in (store, TYPE_TAGS.get(a.kind, "")) if t)
+    store = [hashtag(t) for t in a.store_tag.split()] if a.store_tag else [hashtag(a.store)]
+    extra = ["#brinde"] if is_freebie(a) else []
+    return " ".join(t for t in [*store, TYPE_TAGS.get(a.kind, ""), *extra] if t)
+
+
+def is_freebie(a: Alert) -> bool:
+    """Preço zero costuma ser brinde de compra acima de um valor, não produto grátis."""
+    return not a.is_store_alert and a.price == 0
+
+
+def price_line(a: Alert) -> str:
+    if a.price is None:
+        return ""
+    if is_freebie(a):
+        return "🎁 R$ 0,00 (possível brinde)"
+    return f"💰 {brl(a.price)}"
 
 
 def is_urgent(a: Alert, urgent_stock: int) -> bool:
@@ -121,7 +133,7 @@ def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False) -> str:
     if a.kind == PRICE and a.old_price is not None:
         price = f"💰 <s>{brl(a.old_price)}</s> → <b>{brl(a.price)}</b>"
     else:
-        price = f"💰 {brl(a.price)}" if a.price is not None else ""
+        price = price_line(a)
     if a.kind == REPLENISH and a.old_stock is not None and isinstance(a.stock, int):
         lines.append(" · ".join(x for x in (
             price, f"📦 {a.old_stock} → {a.stock} unidades (+{a.stock - a.old_stock})") if x))
@@ -157,7 +169,7 @@ def compact_line(a: Alert, index: Optional[int] = None, urgent_stock: int = 5) -
     """Uma linha por alerta, para álbuns e resumos."""
     prefix = f"{index}. " if index is not None else ""
     price = (f"<s>{brl(a.old_price)}</s> → {brl(a.price)}" if a.kind == PRICE and a.old_price is not None
-             else brl(a.price))
+             else ("🎁 possível brinde" if is_freebie(a) else brl(a.price)))
     stock = ""
     if a.available and isinstance(a.stock, int):
         stock = f" · 🔥 {a.stock} un." if is_urgent(a, urgent_stock) else f" · {a.stock} un."

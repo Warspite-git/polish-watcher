@@ -163,3 +163,8 @@ def test_sites_yaml_replenish_option():
     assert _parse_threshold(10, "reposicao", 5) == 10
     with pytest.raises(ConfigError):
         _parse_threshold("muito", "reposicao", 5)
+
+
+def test_sites_yaml_joint_brand_hashtags():
+    nb = next(s for s in load_settings("sites.yaml").stores if s.key == "nothingbasicstore.com")
+    assert nb.name == "Nothing Basic & Phoenix" and nb.hashtag == "NothingBasic Phoenix"

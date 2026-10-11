@@ -63,7 +63,7 @@ Pronto. Na próxima rodada o monitor:
       incluir: [magnético, holo]           # só avisa se o nome tiver alguma dessas palavras
       excluir: [lixa, base, top coat]      # nunca avisa se o nome tiver alguma dessas palavras
     pausa_segundos: 1.5                    # pausa entre requisições nesta loja
-    hashtag: Patty                         # hashtag da loja (padrão: gerada do nome → #MinhaLoja)
+    hashtag: Patty                         # hashtag da loja (padrão: gerada do nome → #MinhaLoja); aceita lista: [MarcaA, MarcaB]
     ativo: false                           # desliga a loja sem apagar a configuração
 ```
 

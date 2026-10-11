@@ -39,8 +39,9 @@ lojas:
   - nome: Indie by Patty Lopes
     url: https://www.indiebypattylopes.com.br/
 
-  - nome: Nothing Basic
+  - nome: Nothing Basic & Phoenix      # marca conjunta
     url: https://nothingbasicstore.com/
+    hashtag: [NothingBasic, Phoenix]
 
   - nome: Penelope Luz
     url: https://www.penelopeluzloja.com.br/

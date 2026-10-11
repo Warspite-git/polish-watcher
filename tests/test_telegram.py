@@ -251,3 +251,22 @@ def test_replenish_caption():
     assert "💰 R$ 65,00 · 📦 3 → 30 unidades (+27)" in text
     assert text.endswith("#Loja #reposicao")
     assert [b["text"] for b in buttons(a)["inline_keyboard"][0]] == ["🛒 Comprar", "🏪 Ver a loja"]
+
+
+def test_zero_price_is_possible_freebie():
+    a = alert(); a.price = 0.0; a.stock = 50
+    text = caption(a)
+    assert "🎁 R$ 0,00 (possível brinde) · 📦 50 unidades" in text and "grátis" not in text
+    assert text.endswith("#Loja #novidade #brinde")
+    from monitor.telegram import compact_line
+    assert "🎁 possível brinde" in compact_line(a)
+
+
+def test_store_with_several_hashtags():
+    a = A(kind="new", store="Nothing Basic & Phoenix", store_url="https://nb.test", name="X", url="https://nb.test/p",
+          price=50.0, stock=10, store_tag="NothingBasic Phoenix")
+    text = caption(a)
+    assert "🆕 <b>NOVIDADE</b> · Nothing Basic &amp; Phoenix" in text
+    assert text.endswith("#NothingBasic #Phoenix #novidade")
+    opened = A(kind="store_open", store="Nothing Basic & Phoenix", store_url="https://nb.test", store_tag="NothingBasic Phoenix")
+    assert caption(opened).endswith("#NothingBasic #Phoenix #lojaaberta")
