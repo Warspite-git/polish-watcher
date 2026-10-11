@@ -1,6 +1,8 @@
 name: Monitor de estoque
 
 on:
+  # Disparo principal: cron-job.org chama o workflow_dispatch a cada 15 min (veja o README).
+  # O agendamento do GitHub fica como reserva: na prática ele dispara de forma muito irregular.
   schedule:
     # a cada 15 min, fora do início da hora (pico do GitHub, quando agendamentos atrasam ou somem)
     - cron: "7,22,37,52 * * * *"
@@ -34,6 +36,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
+          # Ponta atual do branch (não o commit do momento do disparo): se uma execução
+          # ficou na fila atrás de outra, ela já parte do estado salvo pela anterior
+          # e não repete os mesmos alertas.
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:

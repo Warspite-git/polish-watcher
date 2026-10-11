@@ -180,7 +180,23 @@ gh secret set TELEGRAM_TOKEN
 gh secret set TELEGRAM_CHAT_ID
 ```
 
-> ⏱️ O agendamento do GitHub não é pontual: em horários de pico, "a cada 15 min" pode virar 20 a 40 min. Repositórios públicos não têm limite de minutos.
+> ⏱️ O agendamento do GitHub não é confiável: neste repositório ele chegou a ficar horas sem disparar. Por isso o disparo principal vem de fora (seção abaixo), e o agendamento do GitHub fica só como reserva. Repositórios públicos não têm limite de minutos.
+
+### Disparador externo (cron-job.org)
+
+O [cron-job.org](https://cron-job.org) (gratuito) chama a API do GitHub a cada 15 minutos para rodar o monitor.
+
+1. **Token do GitHub**, só com o mínimo necessário: [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
+   - *Repository access*: **Only select repositories** → `polish-watcher`
+   - *Permissions → Repository permissions → Actions*: **Read and write** (nada mais)
+   - Com esse token só dá para disparar ou cancelar execuções. Não dá para ler os Secrets nem alterar o código.
+2. **Tarefa no cron-job.org:**
+   - URL: `https://api.github.com/repos/Warspite-git/polish-watcher/actions/workflows/monitor.yml/dispatches`
+   - Agenda: a cada 15 minutos
+   - Método: `POST`. Corpo: `{"ref":"main"}`
+   - Cabeçalhos: `Accept: application/vnd.github+json`, `Authorization: Bearer <token>`, `X-GitHub-Api-Version: 2022-11-28`, `Content-Type: application/json`
+   - Ligue o aviso por e-mail em caso de falha. A resposta esperada é **204**.
+3. Quando o token expirar, gere outro e troque no cron-job.org. Coloque um lembrete na agenda.
 
 ---
 
