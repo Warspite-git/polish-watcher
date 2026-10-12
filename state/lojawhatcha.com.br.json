@@ -497,8 +497,8 @@
     "299219199": {"name": "Funeral March", "price": 65.0, "available": true, "stock": 5, "url": "https://www.lojawhatcha.com.br/produtos/funeral-march/", "first_seen": "2026-10-11"},
     "299220199": {"name": "Lost Souls", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/lost-souls/", "first_seen": "2026-10-11"},
     "299221817": {"name": "Phantom Glow", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/phantom-glow/", "first_seen": "2026-10-11"},
-    "299222384": {"name": "Poisoned Tomb", "price": 65.0, "available": true, "stock": 8, "url": "https://www.lojawhatcha.com.br/produtos/poisoned-tomb/", "first_seen": "2026-10-11"},
-    "299226677": {"name": "Pumpkin Cemetery", "price": 65.0, "available": true, "stock": 8, "url": "https://www.lojawhatcha.com.br/produtos/pumpkin-cemetery/", "first_seen": "2026-10-11"},
+    "299222384": {"name": "Poisoned Tomb", "price": 65.0, "available": true, "stock": 7, "url": "https://www.lojawhatcha.com.br/produtos/poisoned-tomb/", "first_seen": "2026-10-11"},
+    "299226677": {"name": "Pumpkin Cemetery", "price": 65.0, "available": true, "stock": 7, "url": "https://www.lojawhatcha.com.br/produtos/pumpkin-cemetery/", "first_seen": "2026-10-11"},
     "299346714": {"name": "Suporte de esmalte Skull", "price": 45.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/suporte-de-esmalte-skull/", "first_seen": "2026-10-11"},
     "300208601": {"name": "Candy Cane Magnet", "price": 60.0, "available": true, "stock": 3, "url": "https://www.lojawhatcha.com.br/produtos/candy-cane-magnet-9avi3/", "first_seen": "2026-10-11"},
     "303068248": {"name": "Advent Calendar", "price": 800.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/advent-calendar-d5bwx/", "first_seen": "2026-10-11"},
@@ -571,7 +571,7 @@
     "356479212": {"name": "Kit 3 caixinhas padrão Whatcha", "price": 12.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/kit-3-caixinhas-padrao-whatcha-57kyz/", "first_seen": "2026-10-11"},
     "356479419": {"name": "Amour - Foi brinde de junho", "price": 65.0, "available": true, "stock": 3, "url": "https://www.lojawhatcha.com.br/produtos/amour-foi-brinde-de-junho-lfyiy/", "first_seen": "2026-10-11"},
     "356481822": {"name": "Dreams Come True - foi brinde do clube em junho", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/dreams-come-true-foi-brinde-do-clube-em-junho-bt7k6/", "first_seen": "2026-10-11"},
-    "361383685": {"name": "Show Night - Lote 08/26", "price": 75.0, "available": true, "stock": 7, "url": "https://www.lojawhatcha.com.br/produtos/show-night-lote-08-26-1igad/", "first_seen": "2026-10-11"},
+    "361383685": {"name": "Show Night - Lote 08/26", "price": 75.0, "available": true, "stock": 6, "url": "https://www.lojawhatcha.com.br/produtos/show-night-lote-08-26-1igad/", "first_seen": "2026-10-11"},
     "361383785": {"name": "Acrobatics - Lote 08/26", "price": 75.0, "available": true, "stock": 10, "url": "https://www.lojawhatcha.com.br/produtos/acrobatics-lote-08-26-j7ch5/", "first_seen": "2026-10-11"},
     "361383917": {"name": "Avalon - Lote 08/26", "price": 75.0, "available": true, "stock": 5, "url": "https://www.lojawhatcha.com.br/produtos/avalon-lote-08-26-17uq7/", "first_seen": "2026-10-11"},
     "361384753": {"name": "Mother 2.0", "price": 75.0, "available": true, "stock": 16, "url": "https://www.lojawhatcha.com.br/produtos/mother-2-0-14szj/", "first_seen": "2026-10-11"},
@@ -599,7 +599,7 @@
     "373376128": {"name": "Reluzente", "price": 65.0, "available": true, "stock": 27, "url": "https://www.lojawhatcha.com.br/produtos/reluzente-12zkh/", "first_seen": "2026-10-11"},
     "373376721": {"name": "Resoluta", "price": 65.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/resoluta-1h06w/", "first_seen": "2026-10-11"},
     "373377461": {"name": "Enfim, Luísa", "price": 65.0, "available": true, "stock": 5, "url": "https://www.lojawhatcha.com.br/produtos/enfim-luisa-wuurl/", "first_seen": "2026-10-11"},
-    "373440185": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 23, "url": "https://www.lojawhatcha.com.br/produtos/dvw-anaklusmos-uznhi/", "first_seen": "2026-10-11"},
+    "373440185": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 22, "url": "https://www.lojawhatcha.com.br/produtos/dvw-anaklusmos-uznhi/", "first_seen": "2026-10-11"},
     "373442161": {"name": "DVW - Aunty Em's", "price": 65.0, "available": true, "stock": 23, "url": "https://www.lojawhatcha.com.br/produtos/aunty-ems-mepcv/", "first_seen": "2026-10-11"},
     "373442538": {"name": "DVW - Half Blood Camp", "price": 65.0, "available": true, "stock": 29, "url": "https://www.lojawhatcha.com.br/produtos/dvw-half-blood-camp-1mitf/", "first_seen": "2026-10-11"},
     "373442704": {"name": "DVW - Heroes Dreams", "price": 65.0, "available": true, "stock": 30, "url": "https://www.lojawhatcha.com.br/produtos/dvw-heroes-1sk4j/", "first_seen": "2026-10-11"},
@@ -619,9 +619,9 @@
     "373448635": {"name": "Crypt Fire", "price": 65.0, "available": true, "stock": 38, "url": "https://www.lojawhatcha.com.br/produtos/crypt-fire-90rj3/", "first_seen": "2026-10-11"},
     "373448927": {"name": "Iron Gargoyle", "price": 65.0, "available": true, "stock": 48, "url": "https://www.lojawhatcha.com.br/produtos/iron-gargoyle-vu17h/", "first_seen": "2026-10-11"},
     "373449500": {"name": "Mossbound Cloister", "price": 65.0, "available": true, "stock": 36, "url": "https://www.lojawhatcha.com.br/produtos/mossbound-cloister-9d8qp/", "first_seen": "2026-10-11"},
-    "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
+    "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
-    "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 44, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
-    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 52, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
+    "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 43, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
+    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 51, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
   }
 }
