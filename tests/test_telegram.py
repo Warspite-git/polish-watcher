@@ -164,7 +164,7 @@ from monitor.telegram import buttons, hashtag, tags
 def test_hashtags():
     assert hashtag("By Dany Vianna") == "#ByDanyVianna"
     assert hashtag("Indie by Patty Lopes") == "#IndieByPattyLopes"
-    assert hashtag("Pépper Pólish!") == "#PepperPolish"
+    assert hashtag("Ésmalte Bónito!") == "#EsmalteBonito"
     assert hashtag("9 Lives") == "#Loja9Lives"
     assert tags(A(kind="restock", store="Penelope Luz", store_url="")) == "#PenelopeLuz #restock"
     assert tags(A(kind="store_open", store="X", store_url="", store_tag="Patty")) == "#Patty #lojaaberta"
