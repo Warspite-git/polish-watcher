@@ -39,6 +39,7 @@ class StoreConfig:
     exclude: List[str] = field(default_factory=list)
     enabled: bool = True
     listing_path: str = "/produtos/"
+    logo: str = ""  # imagem usada quando o produto não tem foto (vazio = tenta achar no site)
     hashtag: str = ""  # vazio = gerada do nome (ex.: "By Dany Vianna" → #ByDanyVianna); várias separadas por espaço
 
     def wants(self, product_name: str) -> bool:
@@ -149,6 +150,7 @@ def load_settings(path: str = "sites.yaml") -> Settings:
             exclude=_words(filters.get("excluir", default_filters.get("excluir"))),
             enabled=bool(raw.get("ativo", True)),
             listing_path=str(raw.get("caminho_listagem", "/produtos/")),
+            logo=str(raw.get("logo") or ""),
             hashtag=" ".join(str(t).strip().lstrip("#") for t in _words(raw.get("hashtag") or raw.get("hashtags"))),
         ))
 

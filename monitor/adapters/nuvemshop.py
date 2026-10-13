@@ -33,6 +33,9 @@ IMG_SIZE_RE = re.compile(r"-\d+-\d+\.(?:webp|jpe?g|png)$", re.I)
 # ...-<18 hex><10 dígitos = unix timestamp do upload><4 dígitos>-480-0.webp
 IMG_TOKEN_RE = re.compile(r"([0-9a-f]{18})(\d{10})\d{4}(?:-\d+-\d+)?\.\w+(?:\?.*)?$")
 
+# Imagem genérica que a Nuvemshop usa quando o produto não tem foto
+PLACEHOLDER_MARKERS = ("/assets/stores/img/no-photo", "empty-placeholder")
+
 AVAILABLE_MARKERS = ("InStock", "LimitedAvailability", "PreOrder", "PreSale", "OnlineOnly", "BackOrder")
 
 
@@ -230,6 +233,8 @@ def jpg_image(img) -> Optional[str]:
     if not img:
         return None
     img = str(img)
+    if any(marker in img for marker in PLACEHOLDER_MARKERS):
+        return None  # "sem foto": a versão em 640 px nem existe no servidor
     if img.startswith("//"):
         img = "https:" + img
     elif img.startswith("http://"):

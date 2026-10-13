@@ -25,7 +25,8 @@ class FakeAdapter(Adapter):
 
 def open_scan(*pairs):
     products = {pid: Product(id=pid, name=f"Esmalte {pid}", url=f"https://f.test/{pid}", available=avail,
-                             stock=10 if avail else 0, price=50.0) for pid, avail in pairs}
+                             stock=10 if avail else 0, price=50.0, image=f"https://img.test/{pid}.jpg")
+                for pid, avail in pairs}
     return ScanResult(status="open", products=products)
 
 
@@ -172,3 +173,16 @@ def test_sites_yaml_joint_brand_hashtags():
 
 def test_sites_yaml_hides_stock():
     assert load_settings("sites.yaml").show_stock is False
+
+
+def test_alert_without_photo_uses_store_logo(env):
+    from monitor.runner import _fill_missing_photos
+    from monitor.models import Alert
+    settings, _ = env
+    store = settings.stores[0]
+    store.logo = "https://img.test/logo.png"
+    alerts = [Alert(kind="new", store="Fake", store_url="https://f.test", name="X", url="https://f.test/x"),
+              Alert(kind="new", store="Fake", store_url="https://f.test", name="Y", url="https://f.test/y",
+                    image="https://img.test/y.jpg")]
+    _fill_missing_photos(alerts, store, fetcher=None, log=None)
+    assert [a.image for a in alerts] == ["https://img.test/logo.png", "https://img.test/y.jpg"]

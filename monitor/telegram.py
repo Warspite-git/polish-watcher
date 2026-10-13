@@ -344,8 +344,9 @@ class Telegram:
         if a.image and not a.is_store_alert and a.kind != SOLD_OUT:
             try:
                 return self.send_photo(a.image, text, extra)
-            except TelegramError:
-                pass  # sem foto: manda texto com prévia do link (o Telegram mostra a imagem da loja)
+            except TelegramError as e:
+                # sem foto: manda texto com prévia do link (o Telegram mostra a imagem da página)
+                logger.warning(f"foto não enviada ({clean_text(a.store)}: {clean_text(a.name)[:50]}): {e}; indo só com texto")
         preview = not a.is_store_alert and a.kind != SOLD_OUT
         return self.send_text(text, preview=preview, extra=extra)
 

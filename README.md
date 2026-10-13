@@ -21,6 +21,8 @@ Cada alerta chega com a **foto do produto**, nome, loja, preço e estoque, e tem
 - **hashtags** da loja e do tipo (ex.: `#Whatcha #restock`). Tocando numa hashtag, você vê todos os alertas daquela loja ou daquele tipo;
 - **selo de urgência** "🔥 Últimas unidades. Corre!" quando o estoque está baixo (limite em `urgencia_estoque`).
 
+**Produto novo sem foto** (a loja publicou antes de subir a imagem): o monitor espera até 2 verificações (~30 min) pela foto. Se o produto sair do ar nesse meio-tempo, nada é postado; se continuar sem foto, o alerta usa o logo da loja.
+
 A quantidade em estoque **não aparece** nos alertas (`telegram: mostrar_estoque: false`); o monitor continua usando o número internamente para detectar restock, reposição e urgência.
 
 Mudança de preço, loja fechada, avisos de erro e "esgotou" chegam **sem som**. Novidade, restock e loja aberta tocam normalmente. Se aparecerem muitos alertas de uma vez (ex.: lançamento de coleção), eles chegam agrupados em álbuns de até 10 fotos com a lista numerada.
@@ -65,6 +67,7 @@ Pronto. Na próxima rodada o monitor:
       incluir: [magnético, holo]           # só avisa se o nome tiver alguma dessas palavras
       excluir: [lixa, base, top coat]      # nunca avisa se o nome tiver alguma dessas palavras
     pausa_segundos: 1.5                    # pausa entre requisições nesta loja
+    logo: https://…/logo.png               # imagem para produto sem foto (padrão: o logo do próprio site)
     hashtag: Patty                         # hashtag da loja (padrão: gerada do nome → #MinhaLoja); aceita lista: [MarcaA, MarcaB]
     ativo: false                           # desliga a loja sem apagar a configuração
 ```

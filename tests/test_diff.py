@@ -203,3 +203,37 @@ def test_no_replenish_without_stock_count_or_with_variant_restock():
     old = baseline(scan(prod("2", stock=5, variants=v_old)), NOW)
     alerts, _ = diff_products(store(replenish=5), old, scan(prod("2", stock=25, variants=v_new)), NOW)
     assert [a.kind for a in alerts] == ["variant_restock"]  # não duplica com reposição
+
+
+# ------------------------------------------------------------ produto novo sem foto
+
+def nophoto(pid, **kw):
+    p = prod(pid, **kw)
+    p.image = None
+    return p
+
+
+def test_new_product_without_photo_waits_then_announces_with_photo():
+    old = baseline(scan(prod("1")), NOW)
+    alerts, state = diff_products(store(), old, scan(prod("1"), nophoto("2")), NOW)
+    assert alerts == [] and state["2"]["photo_wait"] == 1
+    alerts, state = diff_products(store(), state, scan(prod("1"), prod("2")), NOW)   # a foto subiu
+    assert [(a.kind, a.image) for a in alerts] == [("new", "https://img.test/2.jpg")]
+    assert "photo_wait" not in state["2"]
+
+
+def test_new_product_without_photo_is_announced_after_waiting():
+    old = baseline(scan(prod("1")), NOW)
+    _, state = diff_products(store(), old, scan(prod("1"), nophoto("2")), NOW)
+    alerts, state = diff_products(store(), state, scan(prod("1"), nophoto("2")), NOW)
+    assert alerts == [] and state["2"]["photo_wait"] == 2
+    alerts, state = diff_products(store(), state, scan(prod("1"), nophoto("2")), NOW)
+    assert [a.kind for a in alerts] == ["new"]  # vai sem foto (o runner põe o logo da loja)
+
+
+def test_product_removed_while_waiting_for_photo_is_never_posted():
+    old = baseline(scan(prod("1")), NOW)
+    _, state = diff_products(store(), old, scan(prod("1"), nophoto("2")), NOW)
+    for _ in range(3):
+        alerts, state = diff_products(store(), state, scan(prod("1")), NOW)
+        assert alerts == []

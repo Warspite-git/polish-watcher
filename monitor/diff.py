@@ -15,7 +15,10 @@ MISSING_TO_UNAVAILABLE = 2
 FORGET_AFTER_DAYS = 120
 VARIANT_REFRESH_HOURS = 6
 MAX_STALE_REFRESH = 5
-SOLD_OUT_WINDOW_HOURS = 48  # só responde "esgotou" se o alerta original for recente
+SOLD_OUT_WINDOW_HOURS = 48
+# Produto novo sem foto (loja publicou antes de subir a imagem): espera até N verificações
+# pela foto antes de anunciar. Se o produto sumir nesse meio-tempo, nada é postado.
+PHOTO_WAIT_ROUNDS = 2  # só responde "esgotou" se o alerta original for recente
 
 
 def record_from(p: Product, prev: Optional[dict], today: str, now_iso: str, variants_from_page: bool) -> dict:
@@ -98,7 +101,17 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
 
         if prev is None:
             if cfg.new:
+                if p.image is None and p.available and PHOTO_WAIT_ROUNDS:
+                    products[pid]["photo_wait"] = 1
+                else:
+                    alerts.append(_alert(NEW, store, p, variants=_available_variants(p)))
+            continue
+
+        if prev.get("photo_wait"):  # produto novo que estava esperando a foto
+            if p.available and (p.image or prev["photo_wait"] >= PHOTO_WAIT_ROUNDS):
                 alerts.append(_alert(NEW, store, p, variants=_available_variants(p)))
+            elif p.available:
+                products[pid]["photo_wait"] = prev["photo_wait"] + 1
             continue
 
         was_available = bool(prev.get("available"))

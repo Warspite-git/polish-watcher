@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -14,8 +15,8 @@ from . import state as st
 from .adapters import ADAPTERS, detect_platform
 from .config import Settings, StoreConfig
 from .diff import baseline, diff_products, select_variant_fetches
-from .fetcher import Fetcher
-from .models import (LOW_STOCK, NEW, REPLENISH, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
+from .fetcher import Fetcher, FetchError
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
                      VARIANT_RESTOCK, Alert, clean_text, describe_counts)
 from .telegram import Telegram, caption
 
@@ -130,10 +131,41 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
 
     alerts, products = diff_products(store, state["products"], scan, now, fetched)
     state["products"] = products
+    _fill_missing_photos(alerts, store, fetcher, log)
     out.alerts.extend(alerts)
     out.note = describe_counts(a.kind for a in alerts) or "sem novidades"
     log.info(out.note)
     return finish()
+
+
+LOGO_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK, PRICE}
+OG_IMAGE_RE = re.compile(r'<meta property="og:image(?::secure_url)?" content="([^"]+)"')
+LD_LOGO_RE = re.compile(r'"logo"\s*:\s*"([^"]+)"')
+
+
+def _fill_missing_photos(alerts: List[Alert], store: StoreConfig, fetcher: Fetcher, log):
+    """Alerta de produto sem foto usa o logo da loja (sites.yaml `logo`, ou o do próprio site)."""
+    missing = [a for a in alerts if a.kind in LOGO_KINDS and not a.image]
+    if not missing:
+        return
+    logo = store.logo or _find_logo(store, fetcher)
+    if not logo:
+        log.info(f"{len(missing)} alerta(s) sem foto e sem logo da loja: vão só com texto")
+        return
+    for a in missing:
+        a.image = logo
+
+
+def _find_logo(store: StoreConfig, fetcher: Fetcher) -> Optional[str]:
+    try:
+        page = fetcher.get(store.url + "/").text
+    except FetchError:
+        return None
+    for url in OG_IMAGE_RE.findall(page)[::-1] + LD_LOGO_RE.findall(page):
+        url = "https:" + url if url.startswith("//") else url
+        if url.startswith("https://") and "no-photo" not in url and "placeholder" not in url:
+            return url
+    return None
 
 
 def run(settings: Settings, only: Optional[str] = None, dry_run: bool = False,

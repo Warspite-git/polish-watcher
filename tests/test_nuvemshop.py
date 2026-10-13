@@ -181,3 +181,8 @@ def test_scan_rereads_when_page_size_changes_mid_scan():
     res = adapter(f).scan()
     assert res.complete and f.n == 1
     assert {str(i) for i in range(45)} <= set(res.products)
+
+
+def test_placeholder_image_means_no_photo():
+    assert jpg_image("https://acdn-us.mitiendanube.com/assets/stores/img/no-photo-480-0.webp") is None
+    assert jpg_image("//acdn-us.mitiendanube.com/assets/themes/x/static/images/empty-placeholder.png") is None
