@@ -170,7 +170,8 @@ def test_hidden_product_counts_as_sold_out():
     old["2"]["alert"] = {"msg": 9, "at": (NOW - timedelta(minutes=30)).isoformat()}
     _, state = diff_products(store(), old, scan(prod("1")), NOW)          # sumiu 1 vez
     alerts, state = diff_products(store(), state, scan(prod("1")), NOW)  # sumiu 2 vezes
-    assert [(a.kind, a.reply_to, a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2")]
+    # o runner decide entre os dois: página 404 → apaga o alerta; página no ar → "esgotou"
+    assert [(a.kind, a.reply_to, a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2"), ("retract", 9, "Esmalte 2")]
     assert "alert" not in state["2"] and state["2"]["available"] is False
 
 
@@ -237,3 +238,21 @@ def test_product_removed_while_waiting_for_photo_is_never_posted():
     for _ in range(3):
         alerts, state = diff_products(store(), state, scan(prod("1")), NOW)
         assert alerts == []
+
+
+# ------------------------------------------------------------ produto retirado do site
+
+def test_announced_product_that_vanishes_becomes_retract_candidate():
+    old = baseline(scan(prod("1"), prod("2")), NOW)
+    old["2"]["alert"] = {"msg": 77, "at": (NOW - timedelta(hours=3)).isoformat()}
+    _, state = diff_products(store(), old, scan(prod("1")), NOW)
+    alerts, state = diff_products(store(), state, scan(prod("1")), NOW)
+    assert [(a.kind, a.reply_to, a.url) for a in alerts if a.kind == "retract"] == [("retract", 77, "https://loja.test/produtos/2/")]
+
+
+def test_no_retract_after_telegram_limit_or_without_alert():
+    old = baseline(scan(prod("1"), prod("2"), prod("3")), NOW)
+    old["2"]["alert"] = {"msg": 77, "at": (NOW - timedelta(hours=50)).isoformat()}  # mais de 48h
+    _, state = diff_products(store(), old, scan(prod("1")), NOW)
+    alerts, _ = diff_products(store(), state, scan(prod("1")), NOW)
+    assert alerts == []

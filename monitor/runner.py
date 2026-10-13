@@ -16,7 +16,7 @@ from .adapters import ADAPTERS, detect_platform
 from .config import Settings, StoreConfig
 from .diff import baseline, diff_products, select_variant_fetches
 from .fetcher import Fetcher, FetchError
-from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, RETRACT, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
                      VARIANT_RESTOCK, Alert, clean_text, describe_counts)
 from .telegram import Telegram, caption
 
@@ -131,6 +131,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
 
     alerts, products = diff_products(store, state["products"], scan, now, fetched)
     state["products"] = products
+    alerts = _confirm_retractions(alerts, fetcher, log)
     _fill_missing_photos(alerts, store, fetcher, log)
     out.alerts.extend(alerts)
     out.note = describe_counts(a.kind for a in alerts) or "sem novidades"
@@ -154,6 +155,26 @@ def _fill_missing_photos(alerts: List[Alert], store: StoreConfig, fetcher: Fetch
         return
     for a in missing:
         a.image = logo
+
+
+def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log) -> List[Alert]:
+    """Só apaga o alerta se a página do produto der 404/410 (retirado de verdade).
+
+    Página ainda no ar = a loja só escondeu o produto (ex.: esgotado): o alerta fica.
+    """
+    confirmed, removed = [], set()
+    for a in alerts:
+        if a.kind != RETRACT:
+            continue
+        try:
+            fetcher.get(a.url)
+        except FetchError as e:
+            if re.search(r"HTTP (404|410)", str(e)):
+                confirmed.append(a)
+                removed.add(a.product_id)
+                log.info(f"'{a.name}' foi retirado do site (404): o alerta será apagado do grupo")
+    kept = [a for a in alerts if a.kind != RETRACT and not (a.kind == SOLD_OUT and a.product_id in removed)]
+    return kept + confirmed
 
 
 def _find_logo(store: StoreConfig, fetcher: Fetcher) -> Optional[str]:
@@ -227,15 +248,14 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
     else:
         logger.info(f"{len(queue)} alerta(s) enviado(s) ao Telegram")
     st.save_outbox(failed[-OUTBOX_MAX_SIZE:], state_dir)
-    wants_sold_out = {s.key for s in settings.stores if s.alerts.sold_out}
-    _remember_messages([a for a in queue if a not in failed and a.store_key in wants_sold_out], state_dir, now)
+    _remember_messages([a for a in queue if a not in failed], state_dir, now)
 
 
 ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK}
 
 
 def _remember_messages(sent: List[Alert], state_dir: Path, now: datetime):
-    """Guarda no estado qual mensagem anunciou cada produto, para responder \"⚡ esgotou\" depois."""
+    """Guarda qual mensagem anunciou cada produto (para apagar se ele for retirado, ou responder "esgotou")."""
     by_store: dict = {}
     for a in sent:
         if a.kind in ANNOUNCE_KINDS and a.available and a.message_id and a.store_key and a.product_id:

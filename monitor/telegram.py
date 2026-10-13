@@ -12,7 +12,7 @@ from typing import Dict, List, Optional
 import requests
 
 from .fetcher import user_agent
-from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, RETRACT, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN,
                      STORE_RECOVERED, VARIANT_RESTOCK, Alert, clean_text)
 
 API = "https://api.telegram.org"
@@ -31,6 +31,7 @@ TITLES = {
     LOW_STOCK: "⏳ <b>ÚLTIMAS UNIDADES</b>",
     PRICE: "🏷️ <b>PREÇO MUDOU</b>",
     SOLD_OUT: "⚡ <b>ESGOTOU</b>",
+    RETRACT: "🗑️ <b>ALERTA APAGADO (produto retirado do site)</b>",
     STORE_OPEN: "🔓 <b>LOJA ABERTA</b>",
     STORE_CLOSED: "🔒 <b>LOJA FECHADA COM SENHA</b>",
     STORE_ERROR: "⚠️ <b>NÃO ESTOU CONSEGUINDO LER A LOJA</b>",
@@ -364,6 +365,12 @@ class Telegram:
     def send_alerts(self, alerts: List[Alert], max_individual: int = 10) -> List[Alert]:
         """Envia tudo e devolve os alertas que falharam (para tentar de novo na próxima rodada)."""
         failed: List[Alert] = []
+        for a in [a for a in alerts if a.kind == RETRACT]:  # produto retirado: apaga o alerta antigo
+            try:
+                self.call("deleteMessage", {"chat_id": self.chat_id, "message_id": a.reply_to}, retries=1)
+            except TelegramError as e:
+                logger.warning(f"não consegui apagar o alerta de {clean_text(a.name)[:50]}: {e}")
+        alerts = [a for a in alerts if a.kind != RETRACT]
         store_alerts = [a for a in alerts if a.is_store_alert]
         sold_out = [a for a in alerts if a.kind == SOLD_OUT]
         product_alerts = [a for a in alerts if not a.is_store_alert and a.kind != SOLD_OUT]

@@ -23,6 +23,8 @@ Cada alerta chega com a **foto do produto**, nome, loja, preço e estoque, e tem
 
 **Produto novo sem foto** (a loja publicou antes de subir a imagem): o monitor espera até 2 verificações (~30 min) pela foto. Se o produto sair do ar nesse meio-tempo, nada é postado; se continuar sem foto, o alerta usa o logo da loja.
 
+**Produto retirado do site:** se um produto anunciado some do catálogo em 2 verificações seguidas e a página dele dá **404**, o bot apaga o alerta do grupo (limite do Telegram: até 48h depois do envio). Se a página ainda existir (loja só escondeu o produto), o alerta fica.
+
 A quantidade em estoque **não aparece** nos alertas (`telegram: mostrar_estoque: false`); o monitor continua usando o número internamente para detectar restock, reposição e urgência.
 
 Mudança de preço, loja fechada, avisos de erro e "esgotou" chegam **sem som**. Novidade, restock e loja aberta tocam normalmente. Se aparecerem muitos alertas de uma vez (ex.: lançamento de coleção), eles chegam agrupados em álbuns de até 10 fotos com a lista numerada.

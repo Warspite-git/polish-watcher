@@ -186,3 +186,23 @@ def test_alert_without_photo_uses_store_logo(env):
                     image="https://img.test/y.jpg")]
     _fill_missing_photos(alerts, store, fetcher=None, log=None)
     assert [a.image for a in alerts] == ["https://img.test/logo.png", "https://img.test/y.jpg"]
+
+
+def test_retract_only_when_product_page_is_gone():
+    from monitor.runner import _confirm_retractions
+    from monitor.fetcher import FetchError
+    from monitor.models import Alert
+    import logging
+
+    class F:
+        def get(self, url):
+            if "retirado" in url:
+                raise FetchError(f"HTTP 404 em {url}")
+            return object()
+
+    def a(kind, pid, url):
+        return Alert(kind=kind, store="L", store_url="https://l.test", name=pid, url=url, reply_to=1, product_id=pid)
+    alerts = [a("retract", "x", "https://l.test/retirado"), a("sold_out", "x", "https://l.test/retirado"),
+              a("retract", "y", "https://l.test/escondido"), a("sold_out", "y", "https://l.test/escondido")]
+    out = _confirm_retractions(alerts, F(), logging.getLogger("t"))
+    assert sorted((x.kind, x.product_id) for x in out) == [("retract", "x"), ("sold_out", "y")]

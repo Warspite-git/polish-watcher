@@ -51,6 +51,7 @@ VARIANT_RESTOCK = "variant_restock"
 REPLENISH = "replenish"  # reposição: mais unidades num produto que não chegou a esgotar
 LOW_STOCK = "low_stock"
 PRICE = "price"
+RETRACT = "retract"    # apagar do grupo o alerta de um produto que a loja retirou do ar
 SOLD_OUT = "sold_out"  # resposta "⚡ esgotou" ao alerta que anunciou o produto
 STORE_OPEN = "store_open"
 STORE_CLOSED = "store_closed"
@@ -68,6 +69,7 @@ LABELS = {
     LOW_STOCK: "estoque baixo",
     PRICE: "mudança(s) de preço",
     SOLD_OUT: "esgotado(s)",
+    RETRACT: "alerta(s) apagado(s) (produto retirado)",
     STORE_OPEN: "loja abriu",
     STORE_CLOSED: "loja fechou",
     STORE_ERROR: "aviso de erro",

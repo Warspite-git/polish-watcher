@@ -287,3 +287,10 @@ def test_hide_stock_counts():
     tg = FakeTelegram(); tg.show_stock = False
     tg.send_alert(low)
     assert "3 unidades" not in tg.calls[0][1]["caption"]
+
+
+def test_retract_deletes_old_message_without_posting():
+    tg = FakeTelegram()
+    r = A(kind="retract", store="L", store_url="https://l.test", name="X", url="https://l.test/x", reply_to=321)
+    assert tg.send_alerts([r]) == []
+    assert [(m, d.get("message_id")) for m, d in tg.calls] == [("deleteMessage", 321)]

@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from .config import StoreConfig
-from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, SOLD_OUT, VARIANT_RESTOCK, Alert, Product,
+from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, RETRACT, SOLD_OUT, VARIANT_RESTOCK, Alert, Product,
                      ScanResult, Variant)
 
 # Produto some da listagem em N varreduras completas seguidas → tratado como indisponível
@@ -18,7 +18,9 @@ MAX_STALE_REFRESH = 5
 SOLD_OUT_WINDOW_HOURS = 48
 # Produto novo sem foto (loja publicou antes de subir a imagem): espera até N verificações
 # pela foto antes de anunciar. Se o produto sumir nesse meio-tempo, nada é postado.
-PHOTO_WAIT_ROUNDS = 2  # só responde "esgotou" se o alerta original for recente
+PHOTO_WAIT_ROUNDS = 2
+# O Telegram só deixa o bot apagar mensagens com menos de 48h
+RETRACT_WINDOW_HOURS = 47  # só responde "esgotou" se o alerta original for recente
 
 
 def record_from(p: Product, prev: Optional[dict], today: str, now_iso: str, variants_from_page: bool) -> dict:
@@ -167,6 +169,12 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
                                             name=rec.get("name", ""), url=rec.get("url", ""), available=False,
                                             reply_to=rec["alert"]["msg"], note=note, store_key=store.key,
                                             store_tag=store.hashtag, product_id=pid))
+                sent = rec.get("alert")
+                if sent and sent.get("msg") and not _older_than(sent.get("at"), now, RETRACT_WINDOW_HOURS):
+                    # produto anunciado sumiu: o runner confere se a página dá 404 antes de apagar o alerta
+                    alerts.append(Alert(kind=RETRACT, store=store.name, store_url=store.url, name=rec.get("name", ""),
+                                        url=rec.get("url", ""), reply_to=sent["msg"], store_key=store.key,
+                                        product_id=pid))
                 rec["available"] = False
                 rec.pop("alert", None)
             if _days_since(rec["missing_since"], now.date()) > FORGET_AFTER_DAYS:
