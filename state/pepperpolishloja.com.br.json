@@ -127,6 +127,6 @@
     "367197244": {"name": "Special Mistery Bag Pepper Polish - protótipos", "price": 247.6, "available": true, "stock": 9, "url": "https://www.pepperpolishloja.com.br/produtos/special-mistery-bag-pepper-polish-prototipos-1nth6/", "first_seen": "2026-10-11"},
     "369125084": {"name": "Rocket Magnet", "price": 70.0, "available": true, "stock": 3, "url": "https://www.pepperpolishloja.com.br/produtos/rocket-magnet-177db/", "first_seen": "2026-10-11"},
     "369125512": {"name": "Nuka Cap Magnet", "price": 70.0, "available": true, "stock": 3, "url": "https://www.pepperpolishloja.com.br/produtos/nuka-cap-magnet-9zuy7/", "first_seen": "2026-10-11"},
-    "373876234": {"name": "Enchanted Carousel Magnet - para glass beads", "price": 99.9, "available": true, "stock": 3, "url": "https://www.pepperpolishloja.com.br/produtos/enchanted-carousel-magnet-para-glass-beads-1x36t/", "first_seen": "2026-10-13", "nv": 1, "missing": 1, "missing_since": "2026-10-13"}
+    "373876234": {"name": "Enchanted Carousel Magnet - para glass beads", "price": 99.9, "available": false, "stock": 3, "url": "https://www.pepperpolishloja.com.br/produtos/enchanted-carousel-magnet-para-glass-beads-1x36t/", "first_seen": "2026-10-13", "nv": 1, "missing": 2, "missing_since": "2026-10-13"}
   }
 }
