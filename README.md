@@ -19,7 +19,9 @@ Cada alerta chega com a **foto do produto**, nome, loja, preço e estoque, e tem
 
 - **botões** "🛒 Comprar" e "🏪 Ver a loja";
 - **hashtags** da loja e do tipo (ex.: `#Whatcha #restock`). Tocando numa hashtag, você vê todos os alertas daquela loja ou daquele tipo;
-- **selo de urgência** "🔥 Só 3 unidades. Corre!" quando o estoque está baixo (limite em `urgencia_estoque`).
+- **selo de urgência** "🔥 Últimas unidades. Corre!" quando o estoque está baixo (limite em `urgencia_estoque`).
+
+A quantidade em estoque **não aparece** nos alertas (`telegram: mostrar_estoque: false`); o monitor continua usando o número internamente para detectar restock, reposição e urgência.
 
 Mudança de preço, loja fechada, avisos de erro e "esgotou" chegam **sem som**. Novidade, restock e loja aberta tocam normalmente. Se aparecerem muitos alertas de uma vez (ex.: lançamento de coleção), eles chegam agrupados em álbuns de até 10 fotos com a lista numerada.
 

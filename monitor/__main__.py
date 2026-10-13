@@ -103,6 +103,11 @@ def cmd_chat_id(args) -> int:
 def cmd_test_telegram(args) -> int:
     from .telegram import TelegramError
     tg = _telegram()
+    try:
+        settings = load_settings(args.config)
+        tg.urgent_stock, tg.show_stock = settings.urgent_stock, settings.show_stock
+    except ConfigError:
+        pass
     if not tg.chat_id:
         sys.exit("TELEGRAM_CHAT_ID não definido (rode 'python -m monitor chat-id' para descobrir)")
     try:
@@ -151,7 +156,7 @@ def cmd_recentes(args) -> int:
     dias = int(args.dias) if float(args.dias).is_integer() else args.dias
     print(f"\n{len(alerts)} produto(s) adicionados nos últimos {dias} dia(s), do mais antigo ao mais novo:")
     for a in alerts:
-        print(f"  {a.note.replace('🗓️ Adicionado em ', ''):18} {a.store:20} {a.name[:45]:45} {stock_text(a)}")
+        print(f"  {a.note.replace('🗓️ Adicionado em ', ''):18} {a.store:20} {a.name[:45]:45} {stock_text(a, settings.show_stock)}")
     if problems:
         print("\n⚠️  Lista possivelmente incompleta:\n  " + "\n  ".join(problems))
         if args.enviar and not args.forcar:
@@ -162,6 +167,7 @@ def cmd_recentes(args) -> int:
             print("\n(nada enviado; use --enviar para mandar ao Telegram)")
         return 0
     tg = _telegram()
+    tg.urgent_stock, tg.show_stock = settings.urgent_stock, settings.show_stock
     if not tg.chat_id:
         sys.exit("TELEGRAM_CHAT_ID não definido")
     failed = 0

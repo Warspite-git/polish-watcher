@@ -23,7 +23,8 @@ padrao:
 
 telegram:
   max_alertas_individuais: 10   # acima disso na mesma rodada, agrupa em álbuns
-  urgencia_estoque: 5           # selo "🔥 Só N unidades" com N ou menos (0 desliga)
+  urgencia_estoque: 5           # selo "🔥 Últimas unidades" com N ou menos (0 desliga)
+  mostrar_estoque: false        # true = mostra a quantidade em estoque nos alertas
 
 avancado:
   falhas_para_avisar: 8         # avisa no Telegram após N rodadas seguidas com erro (~2h)

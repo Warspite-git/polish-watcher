@@ -176,7 +176,7 @@ def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: date
             logger.warning(f"TELEGRAM_TOKEN/TELEGRAM_CHAT_ID não configurados: {len(queue)} alerta(s) guardado(s) para depois")
         st.save_outbox(queue[-OUTBOX_MAX_SIZE:], state_dir)
         return
-    tg = Telegram(token, chat_id, urgent_stock=settings.urgent_stock)
+    tg = Telegram(token, chat_id, urgent_stock=settings.urgent_stock, show_stock=settings.show_stock)
     try:  # o bot só funciona no grupo configurado: sai de qualquer outro
         for chat in tg.leave_foreign_chats():
             logger.warning(f"o bot foi adicionado a outro chat e saiu: {clean_text(chat)}")
@@ -256,7 +256,7 @@ def _print_alerts(alerts: List[Alert], settings: Settings):
     logger.info(f"[dry-run] {len(alerts)} alerta(s) que seriam enviados:")
     for a in alerts:
         print("-" * 60)
-        print(caption(a, settings.urgent_stock))
+        print(caption(a, settings.urgent_stock, show_stock=settings.show_stock))
         if a.image:
             print(f"(foto: {a.image})")
     print("-" * 60)

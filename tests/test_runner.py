@@ -168,3 +168,7 @@ def test_sites_yaml_replenish_option():
 def test_sites_yaml_joint_brand_hashtags():
     nb = next(s for s in load_settings("sites.yaml").stores if s.key == "nothingbasicstore.com")
     assert nb.name == "Nothing Basic & Phoenix" and nb.hashtag == "NothingBasic Phoenix"
+
+
+def test_sites_yaml_hides_stock():
+    assert load_settings("sites.yaml").show_stock is False

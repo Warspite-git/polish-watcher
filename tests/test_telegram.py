@@ -270,3 +270,20 @@ def test_store_with_several_hashtags():
     assert text.endswith("#NothingBasic #Phoenix #novidade")
     opened = A(kind="store_open", store="Nothing Basic & Phoenix", store_url="https://nb.test", store_tag="NothingBasic Phoenix")
     assert caption(opened).endswith("#NothingBasic #Phoenix #lojaaberta")
+
+
+def test_hide_stock_counts():
+    from monitor.telegram import compact_line
+    a = alert(); a.stock = 30
+    assert "📦 disponível" in caption(a, show_stock=False) and "30" not in caption(a, show_stock=False)
+    low = alert(); low.stock = 3
+    text = caption(low, show_stock=False)
+    assert "🔥 Últimas unidades. Corre!" in text and "3 unidades" not in text
+    rep = alert(kind="replenish"); rep.old_stock, rep.stock = 3, 30
+    text = caption(rep, show_stock=False)
+    assert "📦 Chegaram mais unidades" in text and "30" not in text
+    assert "un." not in compact_line(a, show_stock=False)
+    assert "🔥 últimas unidades" in compact_line(low, show_stock=False)
+    tg = FakeTelegram(); tg.show_stock = False
+    tg.send_alert(low)
+    assert "3 unidades" not in tg.calls[0][1]["caption"]

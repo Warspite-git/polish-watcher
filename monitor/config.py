@@ -58,6 +58,7 @@ class Settings:
     error_alert_after: int = 8
     max_product_pages: int = 15
     urgent_stock: int = 5  # selo "🔥 Só N unidades" quando o estoque está no limite ou abaixo
+    show_stock: bool = True  # False = alertas não mostram a quantidade em estoque
 
 
 def normalize(text: str) -> str:
@@ -157,6 +158,7 @@ def load_settings(path: str = "sites.yaml") -> Settings:
         stores=stores,
         max_individual_alerts=int(tg.get("max_alertas_individuais", 10)),
         urgent_stock=int(tg.get("urgencia_estoque", 5)),
+        show_stock=bool(tg.get("mostrar_estoque", True)),
         error_alert_after=int(adv.get("falhas_para_avisar", 8)),
         max_product_pages=int(adv.get("max_paginas_produto", 15)),
     )

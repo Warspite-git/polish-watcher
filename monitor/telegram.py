@@ -106,15 +106,15 @@ def is_urgent(a: Alert, urgent_stock: int) -> bool:
             and 0 < a.stock <= urgent_stock)
 
 
-def stock_text(a: Alert) -> str:
+def stock_text(a: Alert, show_stock: bool = True) -> str:
     if not a.available:
         return "esgotado"
-    if a.stock is None:
+    if a.stock is None or not show_stock:
         return "disponível"
     return "1 unidade" if a.stock == 1 else f"{a.stock} unidades"
 
 
-def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False) -> str:
+def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False, show_stock: bool = True) -> str:
     """Legenda do alerta. Os links vão em botões; with_link=True os coloca no texto."""
     if a.kind == SOLD_OUT:
         return "\n".join([f"⚡ <b>{esc(a.note or 'Esgotou')}!</b>",
@@ -135,13 +135,17 @@ def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False) -> str:
     else:
         price = price_line(a)
     if a.kind == REPLENISH and a.old_stock is not None and isinstance(a.stock, int):
-        lines.append(" · ".join(x for x in (
-            price, f"📦 {a.old_stock} → {a.stock} unidades (+{a.stock - a.old_stock})") if x))
+        change = (f"📦 {a.old_stock} → {a.stock} unidades (+{a.stock - a.old_stock})" if show_stock
+                  else "📦 Chegaram mais unidades")
+        lines.append(" · ".join(x for x in (price, change) if x))
     elif is_urgent(a, urgent_stock):
         lines.append(price)
-        lines.append("🔥 Última unidade. Corre!" if a.stock == 1 else f"🔥 Só {a.stock} unidades. Corre!")
+        if not show_stock:
+            lines.append("🔥 Últimas unidades. Corre!")
+        else:
+            lines.append("🔥 Última unidade. Corre!" if a.stock == 1 else f"🔥 Só {a.stock} unidades. Corre!")
     else:
-        lines.append(" · ".join(x for x in (price, "📦 " + stock_text(a)) if x))
+        lines.append(" · ".join(x for x in (price, "📦 " + stock_text(a, show_stock)) if x))
     if a.note:
         lines.append(esc(a.note))
     if with_link:
@@ -165,14 +169,17 @@ def buttons(a: Alert, urgent_stock: int = 5) -> Optional[dict]:
     return {"inline_keyboard": [row]} if row else None
 
 
-def compact_line(a: Alert, index: Optional[int] = None, urgent_stock: int = 5) -> str:
+def compact_line(a: Alert, index: Optional[int] = None, urgent_stock: int = 5, show_stock: bool = True) -> str:
     """Uma linha por alerta, para álbuns e resumos."""
     prefix = f"{index}. " if index is not None else ""
     price = (f"<s>{brl(a.old_price)}</s> → {brl(a.price)}" if a.kind == PRICE and a.old_price is not None
              else ("🎁 possível brinde" if is_freebie(a) else brl(a.price)))
     stock = ""
     if a.available and isinstance(a.stock, int):
-        stock = f" · 🔥 {a.stock} un." if is_urgent(a, urgent_stock) else f" · {a.stock} un."
+        if not show_stock:
+            stock = " · 🔥 últimas unidades" if is_urgent(a, urgent_stock) else ""
+        else:
+            stock = f" · 🔥 {a.stock} un." if is_urgent(a, urgent_stock) else f" · {a.stock} un."
     elif not a.available:
         stock = " · esgotado"
     return f'{prefix}{ICONS.get(a.kind, "•")} <a href="{attr(a.url)}">{esc(_cut(a.name, 45))}</a> — {price}{stock}'
@@ -204,11 +211,13 @@ def _summary_header(store: str, count: int, part: str = "") -> str:
 # ---------------------------------------------------------------- cliente
 
 class Telegram:
-    def __init__(self, token: str, chat_id: str, timeout: float = 30, urgent_stock: int = 5):
+    def __init__(self, token: str, chat_id: str, timeout: float = 30, urgent_stock: int = 5,
+                 show_stock: bool = True):
         self.token = token
         self.chat_id = str(chat_id)
         self.timeout = timeout
         self.urgent_stock = urgent_stock
+        self.show_stock = show_stock  # False = alertas não mostram a quantidade em estoque
         self._last = 0.0
 
     def redact(self, text: str) -> str:
@@ -279,7 +288,7 @@ class Telegram:
     def send_album(self, alerts: List[Alert], header: str):
         lines = [header, group_tags(alerts)]
         for i, a in enumerate(alerts, start=1):
-            lines.append(compact_line(a, i, self.urgent_stock))
+            lines.append(compact_line(a, i, self.urgent_stock, self.show_stock))
         text = "\n".join(lines)
         while visible_len(text) > CAPTION_LIMIT and len(lines) > 3:
             lines.pop()
@@ -301,7 +310,7 @@ class Telegram:
         text, members = "", []
         for store, items in by_store.items():
             block = [(_summary_header(store, len(items)) + "\n" + group_tags(items), None)]
-            block += [(compact_line(a, urgent_stock=self.urgent_stock), a) for a in items]
+            block += [(compact_line(a, urgent_stock=self.urgent_stock, show_stock=self.show_stock), a) for a in items]
             for line, a in block:
                 if text and len(text) + len(line) + 1 > MESSAGE_LIMIT - 100:
                     chunks.append((text, members))
@@ -342,12 +351,12 @@ class Telegram:
 
     def send_alert(self, a: Alert):
         try:
-            msg = self._send_one(a, caption(a, self.urgent_stock), self._extra(a))
+            msg = self._send_one(a, caption(a, self.urgent_stock, show_stock=self.show_stock), self._extra(a))
         except TelegramError as e:
             if "button" not in str(e).lower() and "reply_markup" not in str(e).lower():
                 raise
             # botão recusado (link inválido?): manda sem botões, com o link no texto
-            msg = self._send_one(a, caption(a, self.urgent_stock, with_link=True), self._extra(a, with_buttons=False))
+            msg = self._send_one(a, caption(a, self.urgent_stock, with_link=True, show_stock=self.show_stock), self._extra(a, with_buttons=False))
         a.message_id = (msg or {}).get("message_id") if isinstance(msg, dict) else None
         return msg
 
