@@ -49,11 +49,13 @@ def test_few_alerts_go_individually_with_photo():
     assert [m for m, _ in tg.calls] == ["sendPhoto"] * 3
 
 
-def test_many_alerts_are_grouped_in_albums():
+def test_many_alerts_are_grouped_in_albums(monkeypatch):
+    import monitor.telegram as tgmod
+    monkeypatch.setattr(tgmod, "download_photo", lambda url: b"\xff\xd8\xffJPEG" if url else None)
     tg = FakeTelegram()
     alerts = [alert(i) for i in range(23)] + [alert(99, image=False)]
     tg.send_alerts(alerts, max_individual=10)
-    methods = [m for m, _ in tg.calls]
+    methods = [m for m, _ in tg.calls if m != "getChat"]
     # 23 com foto → álbuns de 10 + 10 + 3; o sem foto vai no resumo em texto
     assert methods == ["sendMediaGroup", "sendMediaGroup", "sendMediaGroup", "sendMessage"]
     import json
@@ -197,7 +199,7 @@ def test_silent_only_for_less_urgent_alerts():
         a = alert(kind=kind, image=False)
         a.store_url = "https://loja.test"
         tg.send_alert(a)
-    silent = [d.get("disable_notification") == "true" for _, d in tg.calls]
+    silent = [d.get("disable_notification") == "true" for m, d in tg.calls if m.startswith("send")]
     assert silent == [False, False, False, True, True]
 
 
@@ -225,7 +227,9 @@ def test_rejected_button_falls_back_to_link_in_text():
     assert "reply_markup" not in data and 'href="https://loja.test/produtos/1/' in data["caption"]
 
 
-def test_message_ids_are_recorded():
+def test_message_ids_are_recorded(monkeypatch):
+    import monitor.telegram as tgmod
+    monkeypatch.setattr(tgmod, "download_photo", lambda url: b"\xff\xd8\xffJPEG")
     class Ids(FakeTelegram):
         n = 100
         def call(self, method, data=None, files=None, retries=3):
@@ -318,3 +322,62 @@ def test_download_photo_falls_back_to_webp_and_converts(monkeypatch):
 def test_jpeg_and_png_pass_through():
     from monitor.telegram import _as_jpeg
     assert _as_jpeg(b"\xff\xd8\xff\xe0data") == b"\xff\xd8\xff\xe0data"
+
+
+# ------------------------------------------------------------ fotos garantidas
+
+class Recorder(FakeTelegram):
+    def __init__(self, fail_urls=(), group=b""):
+        super().__init__()
+        self.fail_urls, self.group = set(fail_urls), group
+
+    def call(self, method, data=None, files=None, retries=3):
+        self.calls.append((method, data, files))
+        if method == "sendPhoto" and not files and data.get("photo") in self.fail_urls:
+            raise TelegramError("sendPhoto: Bad Request: failed to get HTTP URL content")
+        if method == "getChat":
+            return {"photo": {"big_file_id": "F"}} if self.group else {}
+        return {"message_id": 1, "photo": [{}]} if method == "sendPhoto" else {}
+
+    def group_photo(self):
+        return self.group or None
+
+
+def test_single_post_falls_back_to_store_logo(monkeypatch):
+    import monitor.telegram as tgmod
+    monkeypatch.setattr(tgmod, "download_photo", lambda url: None)  # foto quebrada no site
+    tg = Recorder(fail_urls={"https://img.test/1.jpg"})
+    a = alert(1); a.fallback_image = "https://img.test/logo.png"
+    tg.send_alert(a)
+    photos = [d["photo"] for m, d, f in tg.calls if m == "sendPhoto" and not f]
+    assert photos == ["https://img.test/1.jpg", "https://img.test/logo.png"]
+
+
+def test_single_post_falls_back_to_group_photo(monkeypatch):
+    import monitor.telegram as tgmod
+    monkeypatch.setattr(tgmod, "download_photo", lambda url: None)
+    tg = Recorder(fail_urls={"https://img.test/1.jpg"}, group=b"\xff\xd8\xffGROUP")
+    tg.send_alert(alert(1))  # sem logo da loja (caso VMystic)
+    method, data, files = tg.calls[-1]
+    assert method == "sendPhoto" and files["photo"][1] == b"\xff\xd8\xffGROUP"
+
+
+def test_launch_album_survives_webp_and_broken_photos(monkeypatch):
+    """Lançamento grande: fotos .webp e uma foto quebrada não derrubam o álbum."""
+    import monitor.telegram as tgmod
+    def fake(url):
+        if url and "broken" in url:
+            return None
+        return b"\xff\xd8\xffJPEG" if url else None
+    monkeypatch.setattr(tgmod, "download_photo", fake)
+    tg = Recorder(group=b"\xff\xd8\xffGROUP")
+    alerts = [alert(i) for i in range(12)]
+    alerts[3].image = "https://img.test/broken.jpg"  # sem logo: usa a foto do grupo
+    alerts[5].image = "https://img.test/broken.jpg"; alerts[5].fallback_image = "https://img.test/logo.png"
+    assert tg.send_alerts(alerts, max_individual=10) == []
+    albums = [(json.loads(d["media"]), f) for m, d, f in tg.calls if m == "sendMediaGroup"]
+    assert [len(media) for media, _ in albums] == [10, 2]
+    media, files = albums[0]
+    assert media[0]["media"] == "attach://p0" and len(files) == 10  # fotos enviadas como arquivo
+    assert files["p3"][1] == b"\xff\xd8\xffGROUP" and files["p5"][1] == b"\xff\xd8\xffJPEG"
+    assert not [m for m, d, f in tg.calls if m == "sendMessage"]  # nada virou texto

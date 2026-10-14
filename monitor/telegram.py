@@ -220,6 +220,7 @@ class Telegram:
         self.timeout = timeout
         self.urgent_stock = urgent_stock
         self.show_stock = show_stock  # False = alertas não mostram a quantidade em estoque
+        self._group_photo: Optional[bytes] = None  # foto de perfil do grupo (última reserva)
         self._last = 0.0
 
     def redact(self, text: str) -> str:
@@ -287,21 +288,60 @@ class Telegram:
             raise TelegramError("não foi possível baixar a imagem")
         return self.call("sendPhoto", data, files={"photo": ("produto.jpg", content)})
 
-    def send_album(self, alerts: List[Alert], header: str):
-        lines = [header, group_tags(alerts)]
-        for i, a in enumerate(alerts, start=1):
+    def group_photo(self) -> Optional[bytes]:
+        """Foto de perfil do grupo, baixada uma vez: última reserva para post sem foto."""
+        if self._group_photo is None:
+            self._group_photo = b""
+            try:
+                chat = self.call("getChat", {"chat_id": self.chat_id}) or {}
+                file_id = (chat.get("photo") or {}).get("big_file_id")
+                path = (self.call("getFile", {"file_id": file_id}) or {}).get("file_path") if file_id else None
+                if path:
+                    r = requests.get(f"{API}/file/bot{self.token}/{path}", timeout=30)
+                    if r.ok and r.content and len(r.content) <= 10 * 1024 * 1024:
+                        self._group_photo = _as_jpeg(r.content)
+            except Exception as e:
+                logger.warning(f"foto do grupo indisponível: {self.redact(str(e))}")
+        return self._group_photo or None
+
+    def photo_bytes(self, a: Alert) -> Optional[bytes]:
+        """Foto do produto (ou .webp convertido) → logo da loja → foto do grupo."""
+        for source in (a.image, a.fallback_image):
+            if source:
+                content = download_photo(source)
+                if content:
+                    return content
+        return self.group_photo()
+
+    def send_album(self, alerts: List[Alert], header: str) -> List[Alert]:
+        """Álbum com as fotos enviadas como arquivo (um link .webp ou quebrado não derruba o álbum).
+        Devolve os alertas que ficaram de fora por não ter nenhuma foto."""
+        items, files, left_out = [], {}, []
+        for a in alerts:
+            content = self.photo_bytes(a)
+            if content:
+                files[f"p{len(items)}"] = (f"p{len(items)}.jpg", content)
+                items.append(a)
+            else:
+                left_out.append(a)
+        if len(items) < 2:  # álbum precisa de 2 fotos ou mais
+            for a in items:
+                self.send_alert(a)
+            return left_out
+        lines = [header, group_tags(items)]
+        for i, a in enumerate(items, start=1):
             lines.append(compact_line(a, i, self.urgent_stock, self.show_stock))
         text = "\n".join(lines)
         while visible_len(text) > CAPTION_LIMIT and len(lines) > 3:
             lines.pop()
             text = "\n".join(lines + ["…"])
-        media = [{"type": "photo", "media": a.image} for a in alerts]
+        media = [{"type": "photo", "media": f"attach://p{i}"} for i in range(len(items))]
         media[0].update({"caption": text, "parse_mode": "HTML"})
-        sent = self.call("sendMediaGroup", {"chat_id": self.chat_id, "media": json.dumps(media)})
+        sent = self.call("sendMediaGroup", {"chat_id": self.chat_id, "media": json.dumps(media)}, files=files)
         if isinstance(sent, list):
-            for a, msg in zip(alerts, sent):
+            for a, msg in zip(items, sent):
                 a.message_id = (msg or {}).get("message_id")
-        return sent
+        return left_out
 
     def send_digest(self, alerts: List[Alert], silent: bool = False):
         """Resumo só em texto, dividido em mensagens dentro do limite do Telegram."""
@@ -343,12 +383,23 @@ class Telegram:
         return extra
 
     def _send_one(self, a: Alert, text: str, extra: dict):
-        if a.image and not a.is_store_alert and a.kind != SOLD_OUT:
-            try:
-                return self.send_photo(a.image, text, extra)
-            except TelegramError as e:
-                # sem foto: manda texto com prévia do link (o Telegram mostra a imagem da página)
-                logger.warning(f"foto não enviada ({clean_text(a.store)}: {clean_text(a.name)[:50]}): {e}; indo só com texto")
+        if not a.is_store_alert and a.kind != SOLD_OUT:
+            # foto do produto (link direto, depois .webp convertido) → logo da loja → foto do grupo
+            for source in (a.image, a.fallback_image):
+                if not source:
+                    continue
+                try:
+                    return self.send_photo(source, text, extra)
+                except TelegramError as e:
+                    logger.warning(f"foto não enviada ({clean_text(a.store)}: {clean_text(a.name)[:50]}): {e}")
+            group = self.group_photo()
+            if group:
+                try:
+                    return self.call("sendPhoto", {"chat_id": self.chat_id, "caption": text, "parse_mode": "HTML",
+                                                   **extra}, files={"photo": ("grupo.jpg", group)})
+                except TelegramError as e:
+                    logger.warning(f"foto do grupo não enviada: {e}")
+            logger.warning(f"sem nenhuma foto para {clean_text(a.name)[:50]}: indo só com texto")
         preview = not a.is_store_alert and a.kind != SOLD_OUT
         return self.send_text(text, preview=preview, extra=extra)
 
@@ -414,10 +465,9 @@ class Telegram:
         leftovers: List[Alert] = []
         for store, items in by_store.items():
             items.sort(key=lambda a: KIND_ORDER.get(a.kind, 9))
-            with_image = [a for a in items if a.image]
-            take = with_image[:budget]
+            take = items[:budget]
             budget -= len(take)
-            leftovers += with_image[len(take):] + [a for a in items if not a.image]
+            leftovers += items[len(take):]
             chunks = [take[i:i + ALBUM_SIZE] for i in range(0, len(take), ALBUM_SIZE)]
             for n, chunk in enumerate(chunks, start=1):
                 part = f" ({n}/{len(chunks)})" if len(chunks) > 1 else ""
@@ -425,7 +475,7 @@ class Telegram:
                     if len(chunk) == 1:
                         self.send_alert(chunk[0])
                     else:
-                        self.send_album(chunk, _summary_header(store, len(items), part))
+                        leftovers += self.send_album(chunk, _summary_header(store, len(items), part))
                 except TelegramError:
                     leftovers += chunk
         if leftovers:

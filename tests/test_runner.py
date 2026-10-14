@@ -34,7 +34,8 @@ def open_scan(*pairs):
 def env(tmp_path, monkeypatch):
     monkeypatch.setitem(ADAPTERS, "fake", FakeAdapter)
     monkeypatch.delenv("TELEGRAM_TOKEN", raising=False)
-    store = StoreConfig(name="Fake", url="https://f.test", key="f.test", platform="fake", delay=0)
+    store = StoreConfig(name="Fake", url="https://f.test", key="f.test", platform="fake", delay=0,
+                        logo="https://img.test/logo.png")
     settings = Settings(stores=[store], error_alert_after=2)
     return settings, tmp_path
 

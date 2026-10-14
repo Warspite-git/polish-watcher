@@ -92,6 +92,7 @@ class Alert:
     name: str = ""
     url: str = ""
     image: Optional[str] = None
+    fallback_image: Optional[str] = None  # logo da loja, se a foto do produto falhar
     price: Optional[float] = None
     old_price: Optional[float] = None
     old_stock: Optional[int] = None

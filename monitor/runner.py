@@ -145,16 +145,21 @@ LD_LOGO_RE = re.compile(r'"logo"\s*:\s*"([^"]+)"')
 
 
 def _fill_missing_photos(alerts: List[Alert], store: StoreConfig, fetcher: Fetcher, log):
-    """Alerta de produto sem foto usa o logo da loja (sites.yaml `logo`, ou o do próprio site)."""
-    missing = [a for a in alerts if a.kind in LOGO_KINDS and not a.image]
-    if not missing:
+    """Logo da loja (sites.yaml `logo`, ou o do próprio site): foto de quem não tem foto e
+    reserva de quem tem, caso a foto do produto falhe no envio."""
+    product_alerts = [a for a in alerts if a.kind in LOGO_KINDS]
+    if not product_alerts:
         return
     logo = store.logo or _find_logo(store, fetcher)
     if not logo:
-        log.info(f"{len(missing)} alerta(s) sem foto e sem logo da loja: vão só com texto")
+        if any(not a.image for a in product_alerts):
+            log.info("alerta(s) sem foto e sem logo da loja: usam a foto do grupo")
         return
-    for a in missing:
-        a.image = logo
+    for a in product_alerts:
+        if a.image:
+            a.fallback_image = logo
+        else:
+            a.image = logo
 
 
 def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log) -> List[Alert]:
