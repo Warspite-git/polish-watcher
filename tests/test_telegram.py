@@ -381,3 +381,11 @@ def test_launch_album_survives_webp_and_broken_photos(monkeypatch):
     assert media[0]["media"] == "attach://p0" and len(files) == 10  # fotos enviadas como arquivo
     assert files["p3"][1] == b"\xff\xd8\xffGROUP" and files["p5"][1] == b"\xff\xd8\xffJPEG"
     assert not [m for m, d, f in tg.calls if m == "sendMessage"]  # nada virou texto
+
+
+def test_guard_keeps_configured_group_that_became_supergroup(monkeypatch):
+    import monitor.telegram as tgmod
+    monkeypatch.setattr(tgmod, "_migration_target", lambda token, cid: "-1004457" if cid == "-5597" else None)
+    tg = GuardTelegram([added(1, -1004457, "supergroup", "administrator"), added(2, -999)])
+    tg.leave_foreign_chats(allowed=["-5597"])  # o privado estava configurado com o ID antigo
+    assert tg.left == ["-999"]  # não sai do grupo privado convertido; sai do grupo estranho

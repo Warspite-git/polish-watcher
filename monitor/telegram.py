@@ -493,6 +493,16 @@ class Telegram:
     def get_updates(self) -> list:
         return self.call("getUpdates", {"timeout": 0}) or []
 
+    def _migrated_ids(self, allowed) -> set:
+        """IDs novos de grupos configurados (grupos comuns, sem -100) que viraram supergrupo."""
+        out = set()
+        for chat_id in allowed:
+            if str(chat_id).startswith("-") and not str(chat_id).startswith("-100"):
+                new = _migration_target(self.token, str(chat_id))
+                if new:
+                    out.add(new)
+        return out
+
     def leave_foreign_chats(self, allowed: Optional[List[str]] = None) -> List[str]:
         """Garante que o bot só funcione no grupo configurado.
 
@@ -527,6 +537,13 @@ class Telegram:
                 foreign[cid] = m["chat"].get("title") or m["chat"]["type"]
             else:
                 foreign.pop(cid, None)
+        if foreign:
+            # Um grupo configurado que virou supergrupo ganha outro ID (ex.: ao promover alguém a
+            # admin). Não sai dele: só avisa para atualizar o chat_id.
+            migrated = self._migrated_ids(allowed)
+            for cid in [c for c in foreign if c in migrated]:
+                logger.warning(f"um grupo configurado virou supergrupo (novo ID {cid}): atualize o chat_id nos Secrets")
+                foreign.pop(cid)
         left = []
         if foreign:
             me = self.call("getMe")
@@ -574,6 +591,17 @@ def _as_jpeg(content: bytes) -> bytes:
             return out.getvalue()
     except Exception:
         return content
+
+
+def _migration_target(token: str, chat_id: str) -> Optional[str]:
+    """Novo ID de um grupo comum que virou supergrupo (ou None). Não segue a migração."""
+    try:
+        r = requests.post(f"{API}/bot{token}/sendChatAction", data={"chat_id": chat_id, "action": "typing"},
+                          timeout=20).json()
+    except Exception:
+        return None
+    new = (r.get("parameters") or {}).get("migrate_to_chat_id")
+    return str(new) if new else None
 
 
 def _download(url: str, limit: int = 10 * 1024 * 1024) -> Optional[bytes]:
