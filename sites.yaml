@@ -37,9 +37,6 @@ lojas:
   - nome: Elbe
     url: https://www.elbepolish.com.br/
 
-  - nome: Indie by Patty Lopes
-    url: https://www.indiebypattylopes.com.br/
-
   - nome: Nothing Basic & Phoenix      # marca conjunta
     url: https://nothingbasicstore.com/
     hashtag: [NothingBasic, Phoenix]

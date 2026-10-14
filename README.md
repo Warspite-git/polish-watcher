@@ -70,7 +70,7 @@ Pronto. Na próxima rodada o monitor:
       excluir: [lixa, base, top coat]      # nunca avisa se o nome tiver alguma dessas palavras
     pausa_segundos: 1.5                    # pausa entre requisições nesta loja
     logo: https://…/logo.png               # imagem para produto sem foto (padrão: o logo do próprio site)
-    hashtag: Patty                         # hashtag da loja (padrão: gerada do nome → #MinhaLoja); aceita lista: [MarcaA, MarcaB]
+    hashtag: MinhaMarca                    # hashtag da loja (padrão: gerada do nome → #MinhaLoja); aceita lista: [MarcaA, MarcaB]
     ativo: false                           # desliga a loja sem apagar a configuração
 ```
 
