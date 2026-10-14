@@ -332,6 +332,9 @@
     "367324602": {"name": "Mystic Sky", "price": 60.0, "available": false, "stock": 0, "url": "https://www.penelopeluzloja.com.br/produtos/mystic-sky-19hn1/", "first_seen": "2026-10-11"},
     "367329775": {"name": "Harmony", "price": 60.0, "available": true, "stock": 25, "url": "https://www.penelopeluzloja.com.br/produtos/harmony-bczzt/", "first_seen": "2026-10-11"},
     "367331609": {"name": "Respect", "price": 60.0, "available": true, "stock": 24, "url": "https://www.penelopeluzloja.com.br/produtos/respect-dk7bb/", "first_seen": "2026-10-11"},
-    "367332679": {"name": "Sacred Birth", "price": 60.0, "available": true, "stock": 25, "url": "https://www.penelopeluzloja.com.br/produtos/sacred-birth-zj0ry/", "first_seen": "2026-10-11"}
+    "367332679": {"name": "Sacred Birth", "price": 60.0, "available": true, "stock": 25, "url": "https://www.penelopeluzloja.com.br/produtos/sacred-birth-zj0ry/", "first_seen": "2026-10-11"},
+    "374060070": {"name": "Rudolf Nose", "price": 65.0, "available": true, "stock": null, "url": "https://www.penelopeluzloja.com.br/produtos/rudolf-nose-1u5bc/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 127, "at": "2026-10-14T10:15:21+00:00"}},
+    "374060269": {"name": "Mystic Candle", "price": 65.0, "available": true, "stock": null, "url": "https://www.penelopeluzloja.com.br/produtos/mystic-candle-12tq5/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 128, "at": "2026-10-14T10:15:21+00:00"}},
+    "374060419": {"name": "Relax Time", "price": 65.0, "available": true, "stock": null, "url": "https://www.penelopeluzloja.com.br/produtos/relax-time-ejnje/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 129, "at": "2026-10-14T10:15:21+00:00"}}
   }
 }
