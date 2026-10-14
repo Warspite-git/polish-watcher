@@ -600,7 +600,7 @@
     "373376721": {"name": "Resoluta", "price": 65.0, "available": true, "stock": 19, "url": "https://www.lojawhatcha.com.br/produtos/resoluta-1h06w/", "first_seen": "2026-10-11"},
     "373377461": {"name": "Enfim, Luísa", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/enfim-luisa-wuurl/", "first_seen": "2026-10-11"},
     "373440185": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/dvw-anaklusmos-uznhi/", "first_seen": "2026-10-11"},
-    "373442161": {"name": "DVW - Aunty Em's", "price": 65.0, "available": true, "stock": 23, "url": "https://www.lojawhatcha.com.br/produtos/aunty-ems-mepcv/", "first_seen": "2026-10-11"},
+    "373442161": {"name": "DVW - Aunty Em's", "price": 65.0, "available": true, "stock": 22, "url": "https://www.lojawhatcha.com.br/produtos/aunty-ems-mepcv/", "first_seen": "2026-10-11"},
     "373442538": {"name": "DVW - Half Blood Camp", "price": 65.0, "available": true, "stock": 29, "url": "https://www.lojawhatcha.com.br/produtos/dvw-half-blood-camp-1mitf/", "first_seen": "2026-10-11"},
     "373442704": {"name": "DVW - Heroes Dreams", "price": 65.0, "available": true, "stock": 30, "url": "https://www.lojawhatcha.com.br/produtos/dvw-heroes-1sk4j/", "first_seen": "2026-10-11"},
     "373442771": {"name": "DVW - Maia", "price": 65.0, "available": true, "stock": 30, "url": "https://www.lojawhatcha.com.br/produtos/dvw-maia-1j2jh/", "first_seen": "2026-10-11"},
@@ -615,13 +615,13 @@
     "373446551": {"name": "Burnt Reliquary", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/burnt-reliquary-hy2gk/", "first_seen": "2026-10-11"},
     "373447240": {"name": "Cathedral Dust", "price": 65.0, "available": true, "stock": 47, "url": "https://www.lojawhatcha.com.br/produtos/cathedral-dust-1yp54/", "first_seen": "2026-10-11"},
     "373447776": {"name": "Chancel Shadow", "price": 65.0, "available": true, "stock": 25, "url": "https://www.lojawhatcha.com.br/produtos/chancel-shadow-1wo6v/", "first_seen": "2026-10-11"},
-    "373448297": {"name": "Clerestory", "price": 65.0, "available": true, "stock": 26, "url": "https://www.lojawhatcha.com.br/produtos/clerestory-1a4ww/", "first_seen": "2026-10-11"},
+    "373448297": {"name": "Clerestory", "price": 65.0, "available": true, "stock": 25, "url": "https://www.lojawhatcha.com.br/produtos/clerestory-1a4ww/", "first_seen": "2026-10-11"},
     "373448635": {"name": "Crypt Fire", "price": 65.0, "available": true, "stock": 38, "url": "https://www.lojawhatcha.com.br/produtos/crypt-fire-90rj3/", "first_seen": "2026-10-11"},
     "373448927": {"name": "Iron Gargoyle", "price": 65.0, "available": true, "stock": 48, "url": "https://www.lojawhatcha.com.br/produtos/iron-gargoyle-vu17h/", "first_seen": "2026-10-11"},
     "373449500": {"name": "Mossbound Cloister", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/mossbound-cloister-9d8qp/", "first_seen": "2026-10-11"},
-    "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 30, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
+    "373451158": {"name": "Rose Window", "price": 65.0, "available": true, "stock": 29, "url": "https://www.lojawhatcha.com.br/produtos/rose-window-whzup/", "first_seen": "2026-10-11"},
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 33, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
     "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 37, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
-    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 44, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
+    "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": true, "stock": 43, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1}
   }
 }
