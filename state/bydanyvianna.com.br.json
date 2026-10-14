@@ -222,7 +222,7 @@
     "370833846": {"name": "Exclusive Custom", "price": 250.0, "available": true, "stock": 9, "url": "https://www.bydanyvianna.com.br/produtos/exclusive-custom-i08lc/", "first_seen": "2026-10-11"},
     "373474672": {"name": "DVW - Aunty Em's", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/dvw-aunty-ems-35a7b/", "first_seen": "2026-10-11"},
     "373475325": {"name": "DVW - Half-Blood Camp", "price": 65.0, "available": true, "stock": 18, "url": "https://www.bydanyvianna.com.br/produtos/half-blood-camp-3yd51/", "first_seen": "2026-10-11"},
-    "373477094": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 16, "url": "https://www.bydanyvianna.com.br/produtos/dvw-anaklusmos-1gqvm/", "first_seen": "2026-10-11"},
+    "373477094": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 15, "url": "https://www.bydanyvianna.com.br/produtos/dvw-anaklusmos-1gqvm/", "first_seen": "2026-10-11"},
     "373479199": {"name": "DVW - Heroes Dream", "price": 65.0, "available": true, "stock": 18, "url": "https://www.bydanyvianna.com.br/produtos/dvw-heroes-dream-j51tr/", "first_seen": "2026-10-11"},
     "373480611": {"name": "DVW - Lotus", "price": 65.0, "available": true, "stock": 18, "url": "https://www.bydanyvianna.com.br/produtos/dvw-lotus-wn6pn/", "first_seen": "2026-10-11"},
     "373481688": {"name": "DVW - Maia", "price": 65.0, "available": true, "stock": 18, "url": "https://www.bydanyvianna.com.br/produtos/dvw-maia-1ikus/", "first_seen": "2026-10-11"},
@@ -232,9 +232,9 @@
     "373484853": {"name": "DVW - The Protector", "price": 65.0, "available": true, "stock": 15, "url": "https://www.bydanyvianna.com.br/produtos/dvw-the-protector-1gavq/", "first_seen": "2026-10-11"},
     "373486117": {"name": "DVW - Thrill Ride O'Love", "price": 65.0, "available": true, "stock": 16, "url": "https://www.bydanyvianna.com.br/produtos/dvw-thrill-ride-olove-1u03w/", "first_seen": "2026-10-11"},
     "373486831": {"name": "DVW- What Belongs to the Sea", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/dvw-what-belongs-to-the-sea-racra/", "first_seen": "2026-10-11"},
-    "374072683": {"name": "Mystery Bag Sailor Moon", "price": 175.0, "available": true, "stock": 46, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-sailor-moon-1gouy/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 135, "at": "2026-10-14T12:00:32+00:00"}},
+    "374072683": {"name": "Mystery Bag Sailor Moon", "price": 175.0, "available": true, "stock": 45, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-sailor-moon-1gouy/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 135, "at": "2026-10-14T12:00:32+00:00"}},
     "374073139": {"name": "Mysyery Bag Monster High", "price": 175.0, "available": true, "stock": 48, "url": "https://www.bydanyvianna.com.br/produtos/mysyery-bag-monster-high-1tclg/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 136, "at": "2026-10-14T12:05:22+00:00"}},
-    "374073537": {"name": "Mystery Bag Winx", "price": 175.0, "available": true, "stock": 43, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-winx-vwu35/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 137, "at": "2026-10-14T12:05:22+00:00"}},
+    "374073537": {"name": "Mystery Bag Winx", "price": 175.0, "available": true, "stock": 42, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-winx-vwu35/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 137, "at": "2026-10-14T12:05:22+00:00"}},
     "374074536": {"name": "Pour it Up", "price": 75.0, "available": true, "stock": 30, "url": "https://www.bydanyvianna.com.br/produtos/pour-it-up-ex1jv/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 133, "at": "2026-10-14T11:45:28+00:00"}},
     "374075991": {"name": "Cozy Pine", "price": 75.0, "available": true, "stock": 30, "url": "https://www.bydanyvianna.com.br/produtos/cozy-pine-1ft87/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 134, "at": "2026-10-14T11:45:28+00:00"}}
   }
