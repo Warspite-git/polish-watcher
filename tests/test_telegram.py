@@ -294,3 +294,27 @@ def test_retract_deletes_old_message_without_posting():
     r = A(kind="retract", store="L", store_url="https://l.test", name="X", url="https://l.test/x", reply_to=321)
     assert tg.send_alerts([r]) == []
     assert [(m, d.get("message_id")) for m, d in tg.calls] == [("deleteMessage", 321)]
+
+
+def test_download_photo_falls_back_to_webp_and_converts(monkeypatch):
+    import io
+    import monitor.telegram as tgmod
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (8, 8), (200, 50, 120)).save(buf, "WEBP")
+    webp = buf.getvalue()
+    asked = []
+
+    def fake_download(url, limit=0):
+        asked.append(url)
+        return webp if url.endswith(".webp") else None   # o .jpg dá 403
+    monkeypatch.setattr(tgmod, "_download", fake_download)
+    out = tgmod.download_photo("https://cdn.test/stores/1/products/img-abc-640-0.jpg")
+    assert asked == ["https://cdn.test/stores/1/products/img-abc-640-0.jpg",
+                     "https://cdn.test/stores/1/products/img-abc-640-0.webp"]
+    assert out[:3] == b"\xff\xd8\xff"  # virou JPEG
+
+
+def test_jpeg_and_png_pass_through():
+    from monitor.telegram import _as_jpeg
+    assert _as_jpeg(b"\xff\xd8\xff\xe0data") == b"\xff\xd8\xff\xe0data"

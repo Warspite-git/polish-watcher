@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import html
+import io
 import json
 import logging
 import re
@@ -281,7 +282,7 @@ class Telegram:
         except TelegramError:
             pass
         # O Telegram não conseguiu baixar a imagem: baixamos nós e enviamos o arquivo.
-        content = _download(photo_url)
+        content = download_photo(photo_url)
         if content is None:
             raise TelegramError("não foi possível baixar a imagem")
         return self.call("sendPhoto", data, files={"photo": ("produto.jpg", content)})
@@ -487,6 +488,37 @@ class Telegram:
         # confirma as atualizações lidas, para não reprocessá-las
         self.call("getUpdates", {"offset": updates[-1]["update_id"] + 1, "timeout": 0})
         return left
+
+
+WEBP_ALT_RE = re.compile(r"(-\d+-\d+)\.jpe?g(\?.*)?$", re.I)
+
+
+def download_photo(url: str) -> Optional[bytes]:
+    """Baixa a foto em JPEG. Fotos novas da Nuvemshop só existem em .webp (o .jpg dá 403):
+    nesse caso baixa a versão .webp e converte, porque o Telegram não aceita .webp como foto."""
+    candidates = [url]
+    alt = WEBP_ALT_RE.sub(r"\1.webp\2", url)
+    if alt != url:
+        candidates.append(alt)
+    for candidate in candidates:
+        content = _download(candidate)
+        if content:
+            return _as_jpeg(content)
+    return None
+
+
+def _as_jpeg(content: bytes) -> bytes:
+    if content[:3] == b"\xff\xd8\xff" or content[:8] == b"\x89PNG\r\n\x1a\n":
+        return content  # JPEG ou PNG: o Telegram aceita como está
+    try:
+        from PIL import Image
+        Image.MAX_IMAGE_PIXELS = 40_000_000  # recusa imagens absurdamente grandes
+        with Image.open(io.BytesIO(content)) as img:
+            out = io.BytesIO()
+            img.convert("RGB").save(out, "JPEG", quality=90)
+            return out.getvalue()
+    except Exception:
+        return content
 
 
 def _download(url: str, limit: int = 10 * 1024 * 1024) -> Optional[bytes]:
