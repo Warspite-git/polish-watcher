@@ -80,7 +80,7 @@ def attr(text) -> str:
 
 
 def hashtag(text: str) -> str:
-    """"By Dany Vianna" → "#ByDanyVianna" (sem acentos, espaços ou pontuação)."""
+    """"By Ana Lima" → "#ByAnaLima" (sem acentos, espaços ou pontuação)."""
     text = unicodedata.normalize("NFKD", str(text))
     text = "".join(c for c in text if not unicodedata.combining(c))
     tag = "".join(w[:1].upper() + w[1:] for w in re.findall(r"[A-Za-z0-9]+", text))

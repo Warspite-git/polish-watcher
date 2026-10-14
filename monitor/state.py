@@ -68,6 +68,9 @@ def _write_private(path: Path, text: str):
 
 def load(key: str, state_dir: Path = STATE_DIR, private: bool = False) -> dict:
     path = _private_path(key, state_dir) if private else state_dir / f"{key}.json"
+    if private and not path.exists() and (state_dir / f"{key}.json").exists():
+        # loja que acabou de virar privada: lê o estado aberto uma última vez (o save cifra e apaga o aberto)
+        path, private = state_dir / f"{key}.json", False
     if not path.exists():
         return new_state()
     text = _read_private(path) if private else path.read_text(encoding="utf-8")
@@ -105,6 +108,7 @@ def _write(path: Path, content):
 def save(key: str, state: dict, state_dir: Path = STATE_DIR, private: bool = False):
     if private:
         _write_private(_private_path(key, state_dir), dumps(state))
+        (state_dir / f"{key}.json").unlink(missing_ok=True)  # migração: não deixa a cópia aberta
     else:
         _write(state_dir / f"{key}.json", dumps(state))
 

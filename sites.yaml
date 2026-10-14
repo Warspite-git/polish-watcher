@@ -33,21 +33,12 @@ avancado:
   max_paginas_produto: 15       # máx. de páginas de produto abertas por loja por rodada
 
 lojas:
-  - nome: By Dany Vianna
-    url: https://www.bydanyvianna.com.br/
-
-  - nome: DRK
-    url: https://drknails.com.br/
-
   - nome: Elbe
     url: https://www.elbepolish.com.br/
 
   - nome: Nothing Basic & Phoenix      # marca conjunta
     url: https://nothingbasicstore.com/
     hashtag: [NothingBasic, Phoenix]
-
-  - nome: Penelope Luz
-    url: https://www.penelopeluzloja.com.br/
 
   - nome: VMystic
     url: https://www.shopbyvm.com/

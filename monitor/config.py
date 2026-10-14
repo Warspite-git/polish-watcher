@@ -41,7 +41,7 @@ class StoreConfig:
     enabled: bool = True
     listing_path: str = "/produtos/"
     logo: str = ""  # imagem usada quando o produto não tem foto (vazio = tenta achar no site)
-    hashtag: str = ""  # vazio = gerada do nome (ex.: "By Dany Vianna" → #ByDanyVianna); várias separadas por espaço
+    hashtag: str = ""  # vazio = gerada do nome (ex.: "By Ana Lima" → #ByAnaLima); várias separadas por espaço
     # Loja privada (segredo SITES_PRIVADOS): só posta no grupo privado, dados salvos criptografados
     # e o nome não aparece nos logs públicos (aparece o apelido).
     private: bool = False
@@ -141,6 +141,13 @@ def _private_entries(private_yaml: Optional[str]) -> list:
     return data
 
 
+def _key_or_none(raw) -> Optional[str]:
+    try:
+        return normalize_url(raw["url"])[1] if isinstance(raw, dict) and raw.get("url") else None
+    except ConfigError:
+        return None
+
+
 def load_settings(path: str = "sites.yaml", private_yaml: Optional[str] = None) -> Settings:
     p = Path(path)
     if not p.exists():
@@ -157,8 +164,11 @@ def load_settings(path: str = "sites.yaml", private_yaml: Optional[str] = None) 
 
     stores: List[StoreConfig] = []
     seen_keys = set()
-    entries = [(raw, False) for raw in data.get("lojas") or []]
-    entries += [(raw, True) for raw in _private_entries(private_yaml)]
+    private_raw = _private_entries(private_yaml)
+    private_keys = {_key_or_none(raw) for raw in private_raw} - {None}
+    # loja que virou privada mas ainda está no sites.yaml: vale a versão privada
+    entries = [(raw, False) for raw in data.get("lojas") or [] if _key_or_none(raw) not in private_keys]
+    entries += [(raw, True) for raw in private_raw]
     n_private = 0
     for i, (raw, private) in enumerate(entries, start=1):
         where = "SITES_PRIVADOS" if private else "sites.yaml"

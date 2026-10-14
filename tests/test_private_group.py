@@ -141,3 +141,29 @@ def test_private_stores_loaded_from_secret_not_sites_yaml():
     secret = [x for x in s.stores if x.private]
     assert [(x.name, x.display) for x in secret] == [("Loja Secreta", "loja privada 1")]
     assert not any(x.private for x in load_settings("sites.yaml", private_yaml="").stores)
+
+
+def test_store_listed_in_both_places_counts_as_private(tmp_path):
+    """Durante a troca (segredo já atualizado, sites.yaml ainda não) a rodada não pode falhar."""
+    from monitor.config import load_settings
+    cfg = tmp_path / "sites.yaml"
+    cfg.write_text("lojas:\n  - nome: Aberta\n    url: https://aberta.test/\n  - nome: Movida\n    url: https://www.movida.test/\n")
+    settings = load_settings(str(cfg), private_yaml='[{nome: Movida, url: "https://movida.test"}]')
+    assert [(s.key, s.private) for s in settings.stores] == [("aberta.test", False), ("movida.test", True)]
+
+
+def test_store_turned_private_migrates_its_open_state(tmp_path, monkeypatch):
+    from cryptography.fernet import Fernet
+    from monitor import state as st
+    monkeypatch.setenv("STATE_KEY", Fernet.generate_key().decode())
+    saved = st.new_state()
+    saved["baseline"] = "2026-10-11T00:00:00+00:00"
+    saved["products"] = {"1": {"name": "Esmalte", "alert": {"at": "x", "msgs": {"privado": 9}}}}
+    st.save("movida.test", saved, tmp_path)
+    loaded = st.load("movida.test", tmp_path, private=True)  # sem arquivo cifrado ainda: lê o aberto
+    assert loaded == saved
+    st.save("movida.test", loaded, tmp_path, private=True)
+    assert not (tmp_path / "movida.test.json").exists()
+    assert [f.suffix for f in tmp_path.iterdir()] == [".bin"]
+    assert b"Esmalte" not in next(tmp_path.iterdir()).read_bytes()
+    assert st.load("movida.test", tmp_path, private=True) == saved
