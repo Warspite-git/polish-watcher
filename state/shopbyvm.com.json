@@ -282,6 +282,7 @@
     "371838423": {"name": "Scrub Zombie", "price": 52.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/srub-zombie-ymu02/", "first_seen": "2026-10-11"},
     "371839182": {"name": "Base Fortalecedora 3.0", "price": 45.0, "available": true, "stock": 20, "url": "https://www.shopbyvm.com/produtos/base-fortalecedora-3-0-1f2ge/", "first_seen": "2026-10-11"},
     "371840744": {"name": "Golden Elixir Serum bi fasico", "price": 89.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/golden-elixir-serum-bi-fasico-1drkz/", "first_seen": "2026-10-11"},
-    "372390810": {"name": "Diamond Gel Risqué", "price": 18.0, "available": true, "stock": 10, "url": "https://www.shopbyvm.com/produtos/diamond-gel-risque-i3rmg/", "first_seen": "2026-10-11"}
+    "372390810": {"name": "Diamond Gel Risqué", "price": 18.0, "available": true, "stock": 10, "url": "https://www.shopbyvm.com/produtos/diamond-gel-risque-i3rmg/", "first_seen": "2026-10-11"},
+    "374283828": {"name": "Carimbo de Unhas", "price": 42.0, "available": true, "stock": 20, "url": "https://www.shopbyvm.com/produtos/carimbo-de-unhas-1er2c/", "first_seen": "2026-10-14", "nv": 2, "variants": {"1619143863": {"name": "Redondo com strass", "available": true, "stock": 10}, "1619143864": {"name": "Quadrado", "available": true, "stock": 10}}, "variants_checked": "2026-10-14T23:00:32+00:00", "posts": [{"at": "2026-10-14T23:00:32+00:00", "msgs": {"principal": 142, "privado": 26}}], "alert": {"at": "2026-10-14T23:00:32+00:00", "msgs": {"principal": 142, "privado": 26}}}
   }
 }
