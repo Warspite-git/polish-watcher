@@ -231,6 +231,7 @@
     "373484229": {"name": "DVW - The Oracle", "price": 65.0, "available": true, "stock": 16, "url": "https://www.bydanyvianna.com.br/produtos/dvw-the-oracle-1ghfh/", "first_seen": "2026-10-11"},
     "373484853": {"name": "DVW - The Protector", "price": 65.0, "available": true, "stock": 15, "url": "https://www.bydanyvianna.com.br/produtos/dvw-the-protector-1gavq/", "first_seen": "2026-10-11"},
     "373486117": {"name": "DVW - Thrill Ride O'Love", "price": 65.0, "available": true, "stock": 16, "url": "https://www.bydanyvianna.com.br/produtos/dvw-thrill-ride-olove-1u03w/", "first_seen": "2026-10-11"},
-    "373486831": {"name": "DVW- What Belongs to the Sea", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/dvw-what-belongs-to-the-sea-racra/", "first_seen": "2026-10-11"}
+    "373486831": {"name": "DVW- What Belongs to the Sea", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/dvw-what-belongs-to-the-sea-racra/", "first_seen": "2026-10-11"},
+    "374072683": {"name": "Mystery Bag Sailor Moon", "price": 175.0, "available": true, "stock": 50, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-sailor-moon-1gouy/", "first_seen": "2026-10-14", "nv": 1, "photo_wait": 1}
   }
 }
