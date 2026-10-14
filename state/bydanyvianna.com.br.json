@@ -178,7 +178,7 @@
     "306874992": {"name": "The Most Scandalocious Fish in the Sea", "price": 65.0, "available": true, "stock": 15, "url": "https://www.bydanyvianna.com.br/produtos/the-most-scandalocious-fish-in-the-sea-nej9s/", "first_seen": "2026-10-11"},
     "306875967": {"name": "Unlimitted", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/unlimitted-t1j03/", "first_seen": "2026-10-11"},
     "306876576": {"name": "Yellow Brick Road", "price": 65.0, "available": true, "stock": 18, "url": "https://www.bydanyvianna.com.br/produtos/yellow-brick-road-veqwn/", "first_seen": "2026-10-11"},
-    "326239848": {"name": "Glimmering Scales", "price": 65.0, "available": true, "stock": 9, "url": "https://www.bydanyvianna.com.br/produtos/glimmering-scales-16scu/", "first_seen": "2026-10-11"},
+    "326239848": {"name": "Glimmering Scales", "price": 65.0, "available": true, "stock": 8, "url": "https://www.bydanyvianna.com.br/produtos/glimmering-scales-16scu/", "first_seen": "2026-10-11"},
     "326240714": {"name": "Pink Sunset", "price": 65.0, "available": true, "stock": 25, "url": "https://www.bydanyvianna.com.br/produtos/pink-sunset-1653j/", "first_seen": "2026-10-11"},
     "326241277": {"name": "Foxglove", "price": 65.0, "available": true, "stock": 13, "url": "https://www.bydanyvianna.com.br/produtos/foxglove-11br1/", "first_seen": "2026-10-11"},
     "326244687": {"name": "Ellephant Hawk Moth", "price": 65.0, "available": true, "stock": 4, "url": "https://www.bydanyvianna.com.br/produtos/ellephant-hawk-moth-tnrzv/", "first_seen": "2026-10-11"},
@@ -208,7 +208,7 @@
     "359810216": {"name": "Silver Star", "price": 65.0, "available": true, "stock": 26, "url": "https://www.bydanyvianna.com.br/produtos/silver-star-xpdp6/", "first_seen": "2026-10-11"},
     "359811237": {"name": "Seaing Stars", "price": 65.0, "available": true, "stock": 24, "url": "https://www.bydanyvianna.com.br/produtos/seaing-stars-hsekj/", "first_seen": "2026-10-11"},
     "359811713": {"name": "Shards of the Universe", "price": 65.0, "available": true, "stock": 22, "url": "https://www.bydanyvianna.com.br/produtos/shards-of-the-universe-r15qf/", "first_seen": "2026-10-11"},
-    "366300628": {"name": "SLIME", "price": 75.0, "available": true, "stock": 20, "url": "https://www.bydanyvianna.com.br/produtos/slime-ovwku/", "first_seen": "2026-10-11"},
+    "366300628": {"name": "SLIME", "price": 75.0, "available": true, "stock": 19, "url": "https://www.bydanyvianna.com.br/produtos/slime-ovwku/", "first_seen": "2026-10-11"},
     "369954361": {"name": "Classics - Bag Literatura", "price": 90.0, "available": true, "stock": 1, "url": "https://www.bydanyvianna.com.br/produtos/classico-bag-literatura-1hy9u/", "first_seen": "2026-10-11"},
     "369954908": {"name": "Red Carpet - Bag Gaga", "price": 90.0, "available": true, "stock": 1, "url": "https://www.bydanyvianna.com.br/produtos/red-carpet-bag-gaga-10lxr/", "first_seen": "2026-10-11"},
     "369955944": {"name": "Sadako - Bag Terror", "price": 90.0, "available": true, "stock": 3, "url": "https://www.bydanyvianna.com.br/produtos/sadako-bag-terror-1p5he/", "first_seen": "2026-10-11"},
@@ -234,7 +234,7 @@
     "373486831": {"name": "DVW- What Belongs to the Sea", "price": 65.0, "available": true, "stock": 17, "url": "https://www.bydanyvianna.com.br/produtos/dvw-what-belongs-to-the-sea-racra/", "first_seen": "2026-10-11"},
     "374072683": {"name": "Mystery Bag Sailor Moon", "price": 175.0, "available": true, "stock": 46, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-sailor-moon-1gouy/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 135, "at": "2026-10-14T12:00:32+00:00"}},
     "374073139": {"name": "Mysyery Bag Monster High", "price": 175.0, "available": true, "stock": 48, "url": "https://www.bydanyvianna.com.br/produtos/mysyery-bag-monster-high-1tclg/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 136, "at": "2026-10-14T12:05:22+00:00"}},
-    "374073537": {"name": "Mystery Bag Winx", "price": 175.0, "available": true, "stock": 45, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-winx-vwu35/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 137, "at": "2026-10-14T12:05:22+00:00"}},
+    "374073537": {"name": "Mystery Bag Winx", "price": 175.0, "available": true, "stock": 43, "url": "https://www.bydanyvianna.com.br/produtos/mystery-bag-winx-vwu35/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 137, "at": "2026-10-14T12:05:22+00:00"}},
     "374074536": {"name": "Pour it Up", "price": 75.0, "available": true, "stock": 30, "url": "https://www.bydanyvianna.com.br/produtos/pour-it-up-ex1jv/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 133, "at": "2026-10-14T11:45:28+00:00"}},
     "374075991": {"name": "Cozy Pine", "price": 75.0, "available": true, "stock": 30, "url": "https://www.bydanyvianna.com.br/produtos/cozy-pine-1ft87/", "first_seen": "2026-10-14", "nv": 1, "alert": {"msg": 134, "at": "2026-10-14T11:45:28+00:00"}}
   }
