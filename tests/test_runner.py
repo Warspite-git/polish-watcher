@@ -230,3 +230,79 @@ def test_collect_recent_dates_photoless_products_from_history(env):
     assert [(a.name, a.note) for a in alerts] == [("foto-velha", "🗓️ Adicionado em 10/10 (aprox.)"),
                                                   ("nova", "🗓️ Adicionado em 10/10 (aprox.)")]
     assert all(a.image == "https://img.test/logo.png" for a in alerts)
+
+
+@pytest.fixture
+def telegram_and_site(env, monkeypatch):
+    """Telegram falso (toda mensagem recebe o id 555) e páginas de produto controláveis."""
+    import monitor.telegram as tgmod
+    from monitor.fetcher import Fetcher, FetchError
+    calls, site = [], {"gone": False}
+
+    def fake_call(self, method, data=None, files=None, retries=3):
+        calls.append((method, dict(data or {})))
+        return [] if method == "getUpdates" else {"message_id": 555}
+
+    def fake_get(self, url, *a, **k):
+        if site["gone"]:
+            raise FetchError(f"HTTP 404 em {url}")
+        return object()
+
+    monkeypatch.setattr(tgmod.Telegram, "call", fake_call)
+    monkeypatch.setattr(Fetcher, "get", fake_get)
+    monkeypatch.setenv("TELEGRAM_TOKEN", "T")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "-100")
+    return calls, site
+
+
+def deletes(calls):
+    return [d["message_id"] for m, d in calls if m == "deleteMessage"]
+
+
+def test_product_announced_sold_out_is_deleted_when_removed(env, telegram_and_site):
+    """Lançamento que já entrou esgotado e depois foi retirado do site (404): o post é apagado."""
+    from datetime import timedelta
+    settings, state_dir = env
+    calls, site = telegram_and_site
+    FakeAdapter.script = [open_scan(("1", True)), open_scan(("1", True), ("2", False)),
+                          open_scan(("1", True)), open_scan(("1", True))]
+    runner.run(settings, state_dir=state_dir, now=NOW)                          # linha de base
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=15))  # novo (esgotado) → 555
+    assert st.load("f.test", state_dir)["products"]["2"]["posts"][0]["msgs"] == {"principal": 555}
+    site["gone"] = True
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=30))  # sumiu (1ª vez)
+    assert deletes(calls) == []
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=45))  # sumiu (2ª vez) + 404
+    assert deletes(calls) == [555]
+    assert "posts" not in st.load("f.test", state_dir)["products"]["2"]
+
+
+def test_hidden_product_is_deleted_once_its_page_goes_404(env, telegram_and_site):
+    """A loja primeiro esconde o produto (página no ar) e só depois apaga: confere a cada rodada."""
+    from datetime import timedelta
+    settings, state_dir = env
+    calls, site = telegram_and_site
+    FakeAdapter.script = [open_scan(("1", True)), open_scan(("1", True), ("2", True))] + [open_scan(("1", True))] * 4
+    for i in range(4):
+        runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=15 * i))
+    assert deletes(calls) == []                      # escondido, mas a página ainda existe
+    site["gone"] = True
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=60))
+    assert deletes(calls) == [555]
+    runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=75))
+    assert deletes(calls) == [555]                 # não tenta apagar de novo
+
+
+def test_digest_message_shared_by_many_products_is_never_deleted(tmp_path):
+    from monitor.models import Alert, NEW
+    saved = st.new_state()
+    saved["products"] = {str(i): {"name": f"P{i}", "available": True, "first_seen": "2026-10-11"} for i in range(2)}
+    st.save("f.test", saved, tmp_path)
+    store = StoreConfig(name="Fake", url="https://f.test", key="f.test", platform="fake")
+    sent = [Alert(kind=NEW, store="Fake", store_url="https://f.test", name=f"P{i}", url=f"https://f.test/{i}",
+                  available=True, store_key="f.test", product_id=str(i), message_id=777, target="principal")
+            for i in range(2)]
+    runner._remember_messages(sent, Settings(stores=[store]), tmp_path, NOW)
+    products = st.load("f.test", tmp_path)["products"]
+    assert all("posts" not in products[i] for i in ("0", "1"))
+    assert products["0"]["alert"]["msgs"] == {"principal": 777}  # "esgotou" ainda pode responder ao resumo

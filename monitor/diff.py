@@ -47,6 +47,9 @@ def record_from(p: Product, prev: Optional[dict], today: str, now_iso: str, vari
                 rec[k] = prev[k]
     if prev and prev.get("alert") and p.available:
         rec["alert"] = prev["alert"]  # mensagem que anunciou o produto (para responder "esgotou")
+    posts = recent_posts(prev or {}, datetime.fromisoformat(now_iso))
+    if posts:
+        rec["posts"] = posts  # todos os anúncios recentes, mesmo esgotado (para apagar se for retirado)
     return rec
 
 
@@ -161,6 +164,10 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
         if scan.complete:
             rec["missing"] = min(rec.get("missing", 0) + 1, MISSING_TO_UNAVAILABLE)
             rec.setdefault("missing_since", today)
+            posts = recent_posts(rec, now)
+            rec.pop("posts", None)
+            if posts:
+                rec["posts"] = posts
             if rec["missing"] >= MISSING_TO_UNAVAILABLE:
                 if rec.get("available") and cfg.sold_out and store.wants(rec.get("name", "")):
                     note = sold_out_note(rec.get("alert"), now)
@@ -169,11 +176,11 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
                                             name=rec.get("name", ""), url=rec.get("url", ""), available=False,
                                             reply_targets=alert_msgs(rec["alert"]), note=note, store_key=store.key,
                                             store_tag=store.hashtag, product_id=pid, private=store.private))
-                sent = rec.get("alert")
-                if alert_msgs(sent) and not _older_than(sent.get("at"), now, RETRACT_WINDOW_HOURS):
-                    # produto anunciado sumiu: o runner confere se a página dá 404 antes de apagar o alerta
+                # produto anunciado sumiu: o runner confere se a página dá 404 antes de apagar os alertas.
+                # Enquanto a página estiver no ar (só escondido), confere de novo a cada rodada.
+                for post in posts:
                     alerts.append(Alert(kind=RETRACT, store=store.name, store_url=store.url, name=rec.get("name", ""),
-                                        url=rec.get("url", ""), reply_targets=alert_msgs(sent), store_key=store.key,
+                                        url=rec.get("url", ""), reply_targets=alert_msgs(post), store_key=store.key,
                                         product_id=pid, private=store.private))
                 rec["available"] = False
                 rec.pop("alert", None)
@@ -197,6 +204,14 @@ def alert_msgs(sent: Optional[dict]) -> Dict[str, int]:
     if sent.get("msgs"):
         return {k: v for k, v in sent["msgs"].items() if v}
     return {"principal": sent["msg"]} if sent.get("msg") else {}  # formato antigo: só o grupo principal
+
+
+def recent_posts(rec: dict, now: datetime) -> List[dict]:
+    """Mensagens que anunciaram o produto nas últimas RETRACT_WINDOW_HOURS (o bot ainda pode apagá-las)."""
+    posts = rec.get("posts")
+    if posts is None:  # estado antigo: só guardava o último anúncio de produto disponível
+        posts = [rec["alert"]] if rec.get("alert") else []
+    return [p for p in posts if alert_msgs(p) and not _older_than(p.get("at"), now, RETRACT_WINDOW_HOURS)]
 
 
 def sold_out_note(sent: Optional[dict], now: datetime) -> Optional[str]:

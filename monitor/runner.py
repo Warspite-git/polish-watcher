@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import time
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
@@ -14,7 +15,7 @@ from typing import List, Optional
 from . import state as st
 from .adapters import ADAPTERS, detect_platform
 from .config import Settings, StoreConfig
-from .diff import baseline, diff_products, select_variant_fetches
+from .diff import baseline, diff_products, recent_posts, select_variant_fetches
 from .fetcher import Fetcher, FetchError
 from .models import (LOW_STOCK, NEW, PRICE, REPLENISH, RESTOCK, RETRACT, SOLD_OUT, STORE_CLOSED, STORE_ERROR, STORE_OPEN, STORE_RECOVERED,
                      VARIANT_RESTOCK, Alert, clean_text, describe_counts)
@@ -155,6 +156,9 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
     alerts, products = diff_products(store, state["products"], scan, now, fetched)
     state["products"] = products
     alerts = _confirm_retractions(alerts, fetcher, log, store)
+    for a in alerts:
+        if a.kind == RETRACT:  # os alertas vão ser apagados agora: não tenta de novo nas próximas rodadas
+            products.get(a.product_id, {}).pop("posts", None)
     _fill_missing_photos(alerts, store, fetcher, log)
     out.alerts.extend(alerts)
     out.note = describe_counts(a.kind for a in alerts) or "sem novidades"
@@ -190,20 +194,28 @@ def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log, store: Opti
 
     Página ainda no ar = a loja só escondeu o produto (ex.: esgotado): o alerta fica.
     """
-    confirmed, removed = [], set()
+    confirmed, removed, gone = [], set(), {}
     for a in alerts:
         if a.kind != RETRACT:
             continue
-        try:
-            fetcher.get(a.url)
-        except FetchError as e:
-            if re.search(r"HTTP (404|410)", str(e)):
-                confirmed.append(a)
-                removed.add(a.product_id)
+        if a.url not in gone:  # vários anúncios do mesmo produto: abre a página uma vez só
+            gone[a.url] = _page_gone(fetcher, a.url)
+            if gone[a.url]:
                 who = _pname(store, a.name) if store else f"'{a.name}'"
-                log.info(f"{who} foi retirado do site (404): o alerta será apagado do grupo")
+                log.info(f"{who} foi retirado do site (404): o(s) alerta(s) será(ão) apagado(s) do grupo")
+        if gone[a.url]:
+            confirmed.append(a)
+            removed.add(a.product_id)
     kept = [a for a in alerts if a.kind != RETRACT and not (a.kind == SOLD_OUT and a.product_id in removed)]
     return kept + confirmed
+
+
+def _page_gone(fetcher: Fetcher, url: str) -> bool:
+    try:
+        fetcher.get(url)
+    except FetchError as e:
+        return bool(re.search(r"HTTP (404|410)", str(e)))
+    return False
 
 
 def _find_logo(store: StoreConfig, fetcher: Fetcher) -> Optional[str]:
@@ -321,14 +333,17 @@ ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK}
 
 
 def _remember_messages(sent: List[Alert], settings: Settings, state_dir: Path, now: datetime):
-    """Guarda qual mensagem anunciou cada produto em cada grupo (para apagar se ele for
-    retirado do site, ou responder "esgotou")."""
+    """Guarda qual mensagem anunciou cada produto em cada grupo: todos os anúncios recentes
+    em "posts" (para apagar se ele for retirado do site, mesmo que tenha entrado esgotado) e
+    o último anúncio de produto disponível em "alert" (para responder "esgotou")."""
     private_keys = {s.key for s in settings.stores if s.private}
     now_iso = now.isoformat(timespec="seconds")
     by_store: dict = {}
     for a in sent:
-        if a.kind in ANNOUNCE_KINDS and a.available and a.message_id and a.store_key and a.product_id:
+        if a.kind in ANNOUNCE_KINDS and a.message_id and a.store_key and a.product_id:
             by_store.setdefault(a.store_key, []).append(a)
+    # resumo em texto com vários produtos: não é apagado por causa de um só
+    shared = Counter((a.target, a.message_id) for a in sent if a.message_id)
     for key, items in by_store.items():
         private = key in private_keys
         if private and not st.has_key():
@@ -336,7 +351,16 @@ def _remember_messages(sent: List[Alert], settings: Settings, state_dir: Path, n
         state = st.load(key, state_dir, private=private)
         for a in items:
             rec = (state.get("products") or {}).get(a.product_id)
-            if rec is None or not rec.get("available"):
+            if rec is None:
+                continue
+            if shared[(a.target, a.message_id)] == 1:
+                rec["posts"] = posts = recent_posts(rec, now)
+                post = next((x for x in posts if x.get("at") == now_iso), None)
+                if post is None:
+                    post = {"at": now_iso, "msgs": {}}
+                    posts.append(post)
+                post["msgs"][a.target or "principal"] = a.message_id
+            if not (a.available and rec.get("available")):
                 continue
             current = rec.get("alert") or {}
             if a.kind == LOW_STOCK and current and current.get("at") != now_iso:
