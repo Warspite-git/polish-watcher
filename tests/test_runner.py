@@ -207,3 +207,26 @@ def test_retract_only_when_product_page_is_gone():
               a("retract", "y", "https://l.test/escondido"), a("sold_out", "y", "https://l.test/escondido")]
     out = _confirm_retractions(alerts, F(), logging.getLogger("t"))
     assert sorted((x.kind, x.product_id) for x in out) == [("retract", "x"), ("sold_out", "y")]
+
+
+def test_collect_recent_dates_photoless_products_from_history(env):
+    """Sem foto não há data pelo nome da imagem: vale o dia em que o monitor viu o produto."""
+    from monitor.recent import collect_recent
+    settings, state_dir = env
+    saved = st.new_state()
+    saved["baseline"] = "2026-10-08T12:00:00+00:00"
+    saved["products"] = {
+        "antiga": {"name": "Antiga", "first_seen": "2026-10-08"},  # já existia na linha de base
+        "nova": {"name": "Nova", "first_seen": "2026-10-10", "alert": {"at": "2026-10-10T15:00:00+00:00"}},
+        "foto-velha": {"name": "Foto velha", "first_seen": "2026-10-10"},
+    }
+    st.save("f.test", saved, state_dir)
+
+    def p(pid, added=None):
+        return Product(id=pid, name=pid, url=f"https://f.test/{pid}", available=True, added_at=added)
+    FakeAdapter.script = [ScanResult(status="open", products={x.id: x for x in [
+        p("antiga"), p("nova"), p("foto-velha", "2026-09-01T12:00:00+00:00")]})]
+    alerts = collect_recent(settings, 3, now=NOW, state_dir=state_dir)
+    assert [(a.name, a.note) for a in alerts] == [("foto-velha", "🗓️ Adicionado em 10/10 (aprox.)"),
+                                                  ("nova", "🗓️ Adicionado em 10/10 (aprox.)")]
+    assert all(a.image == "https://img.test/logo.png" for a in alerts)
