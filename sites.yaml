@@ -24,7 +24,9 @@ padrao:
 telegram:
   max_alertas_individuais: 10   # acima disso na mesma rodada, agrupa em álbuns
   urgencia_estoque: 5           # selo "🔥 Últimas unidades" com N ou menos (0 desliga)
-  mostrar_estoque: false        # true = mostra a quantidade em estoque nos alertas
+  mostrar_estoque: false        # true = mostra a quantidade em estoque nos alertas (grupo principal)
+  mostrar_estoque_privado: true # grupo privado (TELEGRAM_CHAT_ID_PRIVADO): mostra a quantidade
+  sair_de_outros_grupos: true   # o bot sai de qualquer grupo que não seja o principal ou o privado
 
 avancado:
   falhas_para_avisar: 8         # avisa no Telegram após N rodadas seguidas com erro (~2h)

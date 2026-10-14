@@ -76,7 +76,8 @@ def test_clean_text_blocks_workflow_command_injection():
 
 
 def test_store_log_is_single_line(caplog):
-    log = StoreLog(__import__("logging").getLogger("t"), {"store": "L"})
+    from monitor.config import StoreConfig
+    log = StoreLog(__import__("logging").getLogger("t"), {"store": StoreConfig(name="L", url="https://l.test", key="l.test")})
     with caplog.at_level("INFO"):
         log.info("produto 'A\n::warning::B'")
     assert "\n" not in caplog.records[0].getMessage()

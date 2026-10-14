@@ -140,7 +140,7 @@ def test_announced_products_remember_message_and_get_sold_out_reply(env, monkeyp
     FakeAdapter.script = [open_scan(("1", False)), open_scan(("1", True)), open_scan(("1", False))]
     runner.run(settings, state_dir=state_dir, now=NOW)                          # linha de base
     runner.run(settings, state_dir=state_dir, now=NOW)                          # restock
-    assert st.load("f.test", state_dir)["products"]["1"]["alert"]["msg"] == 555
+    assert st.load("f.test", state_dir)["products"]["1"]["alert"]["msgs"]["principal"] == 555
     runner.run(settings, state_dir=state_dir, now=NOW + timedelta(minutes=14))  # esgotou
     method, data = sent[-1]
     assert method == "sendMessage" and "Esgotou em menos de 15 minutos" in data["text"]

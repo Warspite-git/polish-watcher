@@ -106,6 +106,9 @@ class Alert:
     product_id: str = ""
     reply_to: Optional[int] = None  # responder a esta mensagem do Telegram
     message_id: Optional[int] = None  # preenchido depois do envio
+    private: bool = False            # alerta de loja privada: só vai para o grupo privado
+    target: str = ""                 # grupo de destino desta cópia ("principal" ou "privado")
+    reply_targets: Dict[str, int] = field(default_factory=dict)  # mensagem a responder/apagar em cada grupo
 
     @property
     def is_store_alert(self) -> bool:

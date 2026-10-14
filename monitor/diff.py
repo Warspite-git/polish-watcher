@@ -141,7 +141,7 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
         if was_available and not p.available and cfg.sold_out:
             note = sold_out_note(prev.get("alert"), now)
             if note:
-                alerts.append(_alert(SOLD_OUT, store, p, reply_to=prev["alert"]["msg"], note=note))
+                alerts.append(_alert(SOLD_OUT, store, p, reply_targets=alert_msgs(prev["alert"]), note=note))
 
         threshold = cfg.low_stock
         if (threshold and was_available and p.available and isinstance(p.stock, int)
@@ -167,14 +167,14 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
                     if note:  # a loja escondeu o produto: provavelmente esgotou
                         alerts.append(Alert(kind=SOLD_OUT, store=store.name, store_url=store.url,
                                             name=rec.get("name", ""), url=rec.get("url", ""), available=False,
-                                            reply_to=rec["alert"]["msg"], note=note, store_key=store.key,
-                                            store_tag=store.hashtag, product_id=pid))
+                                            reply_targets=alert_msgs(rec["alert"]), note=note, store_key=store.key,
+                                            store_tag=store.hashtag, product_id=pid, private=store.private))
                 sent = rec.get("alert")
-                if sent and sent.get("msg") and not _older_than(sent.get("at"), now, RETRACT_WINDOW_HOURS):
+                if alert_msgs(sent) and not _older_than(sent.get("at"), now, RETRACT_WINDOW_HOURS):
                     # produto anunciado sumiu: o runner confere se a página dá 404 antes de apagar o alerta
                     alerts.append(Alert(kind=RETRACT, store=store.name, store_url=store.url, name=rec.get("name", ""),
-                                        url=rec.get("url", ""), reply_to=sent["msg"], store_key=store.key,
-                                        product_id=pid))
+                                        url=rec.get("url", ""), reply_targets=alert_msgs(sent), store_key=store.key,
+                                        product_id=pid, private=store.private))
                 rec["available"] = False
                 rec.pop("alert", None)
             if _days_since(rec["missing_since"], now.date()) > FORGET_AFTER_DAYS:
@@ -187,7 +187,16 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
 def _alert(kind: str, store: StoreConfig, p: Product, **extra) -> Alert:
     return Alert(kind=kind, store=store.name, store_url=store.url, name=p.name, url=p.url,
                  image=p.image, price=p.price, stock=p.stock, available=p.available,
-                 store_key=store.key, store_tag=store.hashtag, product_id=p.id, **extra)
+                 store_key=store.key, store_tag=store.hashtag, product_id=p.id, private=store.private, **extra)
+
+
+def alert_msgs(sent: Optional[dict]) -> Dict[str, int]:
+    """Mensagens que anunciaram o produto, por grupo ({"principal": 123, "privado": 45})."""
+    if not sent:
+        return {}
+    if sent.get("msgs"):
+        return {k: v for k, v in sent["msgs"].items() if v}
+    return {"principal": sent["msg"]} if sent.get("msg") else {}  # formato antigo: só o grupo principal
 
 
 def sold_out_note(sent: Optional[dict], now: datetime) -> Optional[str]:
@@ -195,7 +204,7 @@ def sold_out_note(sent: Optional[dict], now: datetime) -> Optional[str]:
 
     O monitor só percebe a mudança na rodada seguinte, então o tempo é um limite superior.
     """
-    if not sent or not sent.get("msg"):
+    if not alert_msgs(sent):
         return None
     try:
         elapsed = now - datetime.fromisoformat(sent["at"])

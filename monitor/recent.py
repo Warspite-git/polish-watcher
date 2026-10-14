@@ -26,7 +26,7 @@ def _store_products(store: StoreConfig, problems: Optional[list] = None) -> List
     fetcher = Fetcher(delay=store.delay, allowed_host=store.key)
     platform = store.platform
     if platform == "auto":
-        platform = st.load(store.key).get("platform") or detect_platform(fetcher, store.url)
+        platform = st.load(store.key, private=store.private).get("platform") or detect_platform(fetcher, store.url)
     scan = ADAPTERS[platform](store, fetcher).scan()
     if not scan.complete and problems is not None:
         problems.append(f"{store.name}: leitura incompleta")

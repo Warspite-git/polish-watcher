@@ -55,6 +55,10 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # grupo privado (opcional): recebe todas as lojas, inclusive as privadas
+          TELEGRAM_CHAT_ID_PRIVADO: ${{ secrets.TELEGRAM_CHAT_ID_PRIVADO }}
+          SITES_PRIVADOS: ${{ secrets.SITES_PRIVADOS }}
+          STATE_KEY: ${{ secrets.STATE_KEY }}
           LOJA: ${{ inputs.loja }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |

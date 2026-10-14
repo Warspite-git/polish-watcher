@@ -209,6 +209,28 @@ O [cron-job.org](https://cron-job.org) (gratuito) chama a API do GitHub a cada 1
 
 ---
 
+## 🔒 Grupo privado (opcional)
+
+Além do grupo principal, o monitor pode postar num **segundo grupo privado** que recebe **todas** as lojas, inclusive lojas que não devem aparecer no grupo principal ("lojas privadas").
+
+| | Grupo principal | Grupo privado |
+|---|---|---|
+| Lojas do `sites.yaml` | ✅ | ✅ |
+| Lojas privadas | ❌ nunca | ✅ |
+| Quantidade em estoque | `mostrar_estoque` | `mostrar_estoque_privado` |
+
+Como o repositório é público, as lojas privadas **não ficam no `sites.yaml`**:
+
+- **`SITES_PRIVADOS`** (Secret): a lista delas, no mesmo formato de `lojas`, por exemplo `[{nome: Minha Loja, url: "https://www.minhaloja.com.br/"}]`;
+- **`STATE_KEY`** (Secret): chave que **criptografa** o estado dessas lojas (`state/p-….bin`, com nome de arquivo que não revela a loja);
+- **`TELEGRAM_CHAT_ID_PRIVADO`** (Secret): o grupo privado.
+
+Nos logs públicos do Actions, as lojas privadas aparecem como "loja privada 1", "loja privada 2"…, sem nome, endereço nem produtos. A mensagem do commit não conta os alertas delas.
+
+Para enviar novidades recentes ao grupo privado: `python -m monitor recentes --dias 3 --grupo privado --enviar`.
+
+---
+
 ## 🔐 Segurança
 
 - **Segredos** só no `.env` local (ignorado pelo git) e nos **Secrets** do GitHub. O token do bot nunca aparece nos logs: o código o remove de qualquer mensagem de erro, e o GitHub mascara os Secrets.

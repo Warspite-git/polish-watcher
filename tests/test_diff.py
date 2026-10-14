@@ -146,7 +146,7 @@ def test_sold_out_reply_only_for_announced_products():
     old["1"]["alert"] = {"msg": 42, "at": (NOW - timedelta(minutes=20)).isoformat()}
     alerts, state = diff_products(store(), old, scan(prod("1", available=False, stock=0),
                                                      prod("2", available=False, stock=0)), NOW)
-    assert [(a.kind, a.reply_to, a.note) for a in alerts] == [("sold_out", 42, "Esgotou em menos de 20 minutos")]
+    assert [(a.kind, a.reply_targets.get("principal"), a.note) for a in alerts] == [("sold_out", 42, "Esgotou em menos de 20 minutos")]
     assert "alert" not in state["1"]  # não responde duas vezes
     assert alerts[0].store_key == "loja.test" and alerts[0].product_id == "1"
 
@@ -171,7 +171,7 @@ def test_hidden_product_counts_as_sold_out():
     _, state = diff_products(store(), old, scan(prod("1")), NOW)          # sumiu 1 vez
     alerts, state = diff_products(store(), state, scan(prod("1")), NOW)  # sumiu 2 vezes
     # o runner decide entre os dois: página 404 → apaga o alerta; página no ar → "esgotou"
-    assert [(a.kind, a.reply_to, a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2"), ("retract", 9, "Esmalte 2")]
+    assert [(a.kind, a.reply_targets.get("principal"), a.name) for a in alerts] == [("sold_out", 9, "Esmalte 2"), ("retract", 9, "Esmalte 2")]
     assert "alert" not in state["2"] and state["2"]["available"] is False
 
 
@@ -247,7 +247,7 @@ def test_announced_product_that_vanishes_becomes_retract_candidate():
     old["2"]["alert"] = {"msg": 77, "at": (NOW - timedelta(hours=3)).isoformat()}
     _, state = diff_products(store(), old, scan(prod("1")), NOW)
     alerts, state = diff_products(store(), state, scan(prod("1")), NOW)
-    assert [(a.kind, a.reply_to, a.url) for a in alerts if a.kind == "retract"] == [("retract", 77, "https://loja.test/produtos/2/")]
+    assert [(a.kind, a.reply_targets.get("principal"), a.url) for a in alerts if a.kind == "retract"] == [("retract", 77, "https://loja.test/produtos/2/")]
 
 
 def test_no_retract_after_telegram_limit_or_without_alert():

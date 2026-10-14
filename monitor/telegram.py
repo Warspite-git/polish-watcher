@@ -57,6 +57,11 @@ class TelegramError(Exception):
     pass
 
 
+def _who(a: Alert) -> str:
+    """Identifica o alerta nos logs (públicos): loja privada não tem nome nem produto revelados."""
+    return "loja privada" if a.private else f"{clean_text(a.store)}: {clean_text(a.name)[:50]}"
+
+
 # ---------------------------------------------------------------- formatação
 
 def brl(value: Optional[float]) -> str:
@@ -391,7 +396,7 @@ class Telegram:
                 try:
                     return self.send_photo(source, text, extra)
                 except TelegramError as e:
-                    logger.warning(f"foto não enviada ({clean_text(a.store)}: {clean_text(a.name)[:50]}): {e}")
+                    logger.warning(f"foto não enviada ({_who(a)}): {e}")
             group = self.group_photo()
             if group:
                 try:
@@ -399,7 +404,7 @@ class Telegram:
                                                    **extra}, files={"photo": ("grupo.jpg", group)})
                 except TelegramError as e:
                     logger.warning(f"foto do grupo não enviada: {e}")
-            logger.warning(f"sem nenhuma foto para {clean_text(a.name)[:50]}: indo só com texto")
+            logger.warning(f"sem nenhuma foto para {_who(a)}: indo só com texto")
         preview = not a.is_store_alert and a.kind != SOLD_OUT
         return self.send_text(text, preview=preview, extra=extra)
 
@@ -421,7 +426,7 @@ class Telegram:
             try:
                 self.call("deleteMessage", {"chat_id": self.chat_id, "message_id": a.reply_to}, retries=1)
             except TelegramError as e:
-                logger.warning(f"não consegui apagar o alerta de {clean_text(a.name)[:50]}: {e}")
+                logger.warning(f"não consegui apagar o alerta de {_who(a)}: {e}")
         alerts = [a for a in alerts if a.kind != RETRACT]
         store_alerts = [a for a in alerts if a.is_store_alert]
         sold_out = [a for a in alerts if a.kind == SOLD_OUT]
@@ -488,7 +493,7 @@ class Telegram:
     def get_updates(self) -> list:
         return self.call("getUpdates", {"timeout": 0}) or []
 
-    def leave_foreign_chats(self) -> List[str]:
+    def leave_foreign_chats(self, allowed: Optional[List[str]] = None) -> List[str]:
         """Garante que o bot só funcione no grupo configurado.
 
         Sai de qualquer outro grupo em que alguém tenha adicionado o bot (canais só geram
@@ -501,7 +506,7 @@ class Telegram:
             "timeout": 0, "allowed_updates": json.dumps(["my_chat_member", "message"])}) or []
         if not updates:
             return []
-        allowed = {self.chat_id}
+        allowed = {self.chat_id, *(str(c) for c in (allowed or []))}
         for u in updates:
             msg = u.get("message") or {}
             if str(msg.get("migrate_from_chat_id")) in allowed:

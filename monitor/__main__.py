@@ -130,7 +130,7 @@ def _sample_alert(config: str):
         stores = load_settings(config).stores
     except ConfigError:
         return None
-    for store in stores:
+    for store in [s for s in stores if not s.private]:
         path = STATE_DIR / f"{store.key}.json"
         if not path.exists():
             continue
@@ -152,6 +152,9 @@ def cmd_recentes(args) -> int:
         logging.error(f"sites.yaml: {e}")
         return 2
     problems: list = []
+    privado = args.grupo == "privado"
+    if not privado:  # lojas privadas nunca vão para o grupo principal
+        settings.stores = [s for s in settings.stores if not s.private]
     alerts = collect_recent(settings, args.dias, only=args.store, available_only=args.disponiveis, problems=problems)
     dias = int(args.dias) if float(args.dias).is_integer() else args.dias
     print(f"\n{len(alerts)} produto(s) adicionados nos últimos {dias} dia(s), do mais antigo ao mais novo:")
@@ -167,7 +170,10 @@ def cmd_recentes(args) -> int:
             print("\n(nada enviado; use --enviar para mandar ao Telegram)")
         return 0
     tg = _telegram()
-    tg.urgent_stock, tg.show_stock = settings.urgent_stock, settings.show_stock
+    if privado:
+        tg.chat_id = os.environ.get("TELEGRAM_CHAT_ID_PRIVADO", "")
+    tg.urgent_stock = settings.urgent_stock
+    tg.show_stock = settings.show_stock_private if privado else settings.show_stock
     if not tg.chat_id:
         sys.exit("TELEGRAM_CHAT_ID não definido")
     failed = 0
@@ -222,6 +228,8 @@ def main(argv=None) -> int:
     rec.add_argument("--enviar", action="store_true", help="envia um alerta por produto ao Telegram")
     rec.add_argument("--intervalo", type=float, default=3.5, help="segundos entre mensagens (padrão 3.5)")
     rec.add_argument("--forcar", action="store_true", help="envia mesmo se alguma loja foi lida de forma incompleta")
+    rec.add_argument("--grupo", choices=["principal", "privado"], default="principal",
+                     help="principal (padrão, sem lojas privadas) ou privado (todas as lojas)")
     det = sub.add_parser("detect", help="detecta a plataforma de uma loja")
     det.add_argument("url")
 

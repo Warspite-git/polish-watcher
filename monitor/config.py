@@ -1,6 +1,7 @@
 """Leitura e validação do sites.yaml."""
 from __future__ import annotations
 
+import os
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -41,6 +42,15 @@ class StoreConfig:
     listing_path: str = "/produtos/"
     logo: str = ""  # imagem usada quando o produto não tem foto (vazio = tenta achar no site)
     hashtag: str = ""  # vazio = gerada do nome (ex.: "By Dany Vianna" → #ByDanyVianna); várias separadas por espaço
+    # Loja privada (segredo SITES_PRIVADOS): só posta no grupo privado, dados salvos criptografados
+    # e o nome não aparece nos logs públicos (aparece o apelido).
+    private: bool = False
+    alias: str = ""
+
+    @property
+    def display(self) -> str:
+        """Nome para logs públicos."""
+        return (self.alias or "loja privada") if self.private else self.name
 
     def wants(self, product_name: str) -> bool:
         """Aplica os filtros de palavra-chave (sem diferenciar maiúsculas/acentos)."""
@@ -58,8 +68,10 @@ class Settings:
     max_individual_alerts: int = 10
     error_alert_after: int = 8
     max_product_pages: int = 15
+    guard: bool = True  # o bot sai de grupos que não são os configurados
     urgent_stock: int = 5  # selo "🔥 Só N unidades" quando o estoque está no limite ou abaixo
     show_stock: bool = True  # False = alertas não mostram a quantidade em estoque
+    show_stock_private: bool = True  # idem, no grupo privado
 
 
 def normalize(text: str) -> str:
@@ -114,11 +126,28 @@ def _words(value) -> List[str]:
     return [str(v) for v in value if str(v).strip()]
 
 
-def load_settings(path: str = "sites.yaml") -> Settings:
+def _private_entries(private_yaml: Optional[str]) -> list:
+    """Lojas privadas: lista YAML (mesmo formato de `lojas`) vinda do segredo SITES_PRIVADOS."""
+    if not private_yaml or not private_yaml.strip():
+        return []
+    try:
+        data = yaml.safe_load(private_yaml)
+    except yaml.YAMLError:
+        raise ConfigError("SITES_PRIVADOS não é um YAML válido")
+    if isinstance(data, dict):
+        data = data.get("lojas")
+    if not isinstance(data, list):
+        raise ConfigError("SITES_PRIVADOS deve ser uma lista de lojas")
+    return data
+
+
+def load_settings(path: str = "sites.yaml", private_yaml: Optional[str] = None) -> Settings:
     p = Path(path)
     if not p.exists():
         raise ConfigError(f"Arquivo de configuração não encontrado: {path}")
     data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    if private_yaml is None:
+        private_yaml = os.environ.get("SITES_PRIVADOS", "")
 
     defaults = data.get("padrao") or {}
     default_alerts = _alerts(defaults.get("alertas"), AlertConfig())
@@ -128,16 +157,22 @@ def load_settings(path: str = "sites.yaml") -> Settings:
 
     stores: List[StoreConfig] = []
     seen_keys = set()
-    for i, raw in enumerate(data.get("lojas") or [], start=1):
+    entries = [(raw, False) for raw in data.get("lojas") or []]
+    entries += [(raw, True) for raw in _private_entries(private_yaml)]
+    n_private = 0
+    for i, (raw, private) in enumerate(entries, start=1):
+        where = "SITES_PRIVADOS" if private else "sites.yaml"
         if not isinstance(raw, dict) or not raw.get("url"):
-            raise ConfigError(f"Loja #{i} sem 'url' no sites.yaml")
+            raise ConfigError(f"Loja #{i} sem 'url' no {where}")
         base, key = normalize_url(raw["url"])
         if key in seen_keys:
-            raise ConfigError(f"Loja repetida no sites.yaml: {key}")
+            # não repete o domínio de uma loja privada na mensagem (os logs são públicos)
+            raise ConfigError(f"Loja repetida no {where}" + ("" if private else f": {key}"))
         seen_keys.add(key)
         platform = str(raw.get("plataforma", default_platform)).lower()
         if platform not in PLATFORMS:
-            raise ConfigError(f"Plataforma desconhecida '{platform}' em {key}. Use: {', '.join(PLATFORMS)}")
+            raise ConfigError(f"Plataforma desconhecida '{platform}' em uma loja do {where}. Use: {', '.join(PLATFORMS)}")
+        n_private += private
         filters = raw.get("filtros") or {}
         stores.append(StoreConfig(
             name=str(raw.get("nome") or key),
@@ -152,6 +187,8 @@ def load_settings(path: str = "sites.yaml") -> Settings:
             listing_path=str(raw.get("caminho_listagem", "/produtos/")),
             logo=str(raw.get("logo") or ""),
             hashtag=" ".join(str(t).strip().lstrip("#") for t in _words(raw.get("hashtag") or raw.get("hashtags"))),
+            private=private,
+            alias=f"loja privada {n_private}" if private else "",
         ))
 
     tg = data.get("telegram") or {}
@@ -161,6 +198,8 @@ def load_settings(path: str = "sites.yaml") -> Settings:
         max_individual_alerts=int(tg.get("max_alertas_individuais", 10)),
         urgent_stock=int(tg.get("urgencia_estoque", 5)),
         show_stock=bool(tg.get("mostrar_estoque", True)),
+        show_stock_private=bool(tg.get("mostrar_estoque_privado", True)),
+        guard=bool(tg.get("sair_de_outros_grupos", True)),
         error_alert_after=int(adv.get("falhas_para_avisar", 8)),
         max_product_pages=int(adv.get("max_paginas_produto", 15)),
     )

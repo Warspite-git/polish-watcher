@@ -6,7 +6,7 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List, Optional
@@ -26,9 +26,25 @@ OUTBOX_MAX_AGE = timedelta(hours=24)
 OUTBOX_MAX_SIZE = 50
 
 
+def _mask(store: StoreConfig, text: str) -> str:
+    """Esconde nome e domínio de loja privada (os logs do Actions são públicos)."""
+    text = clean_text(text)
+    if store.private:
+        host = (store.url.split("://", 1)[-1]).split("/")[0]
+        for secret in sorted({store.name, store.key, host}, key=len, reverse=True):
+            if secret:
+                text = re.sub(re.escape(secret), store.display, text, flags=re.I)
+    return text
+
+
+def _pname(store: StoreConfig, name: str) -> str:
+    """Nome de produto para o log: oculto em loja privada."""
+    return "um produto" if store.private else f"'{name}'"
+
+
 class StoreLog(logging.LoggerAdapter):
     def process(self, msg, kwargs):
-        return f"[{self.extra['store']}] {clean_text(msg)}", kwargs
+        return f"[{self.extra['store'].display}] {_mask(self.extra['store'], str(msg))}", kwargs
 
 
 @dataclass
@@ -45,10 +61,14 @@ class Outcome:
 
 
 def process_store(store: StoreConfig, settings: Settings, now: datetime, state_dir: Path, save: bool) -> Outcome:
-    log = StoreLog(logger, {"store": store.name})
+    log = StoreLog(logger, {"store": store})
     out = Outcome(store)
     t0 = time.monotonic()
-    state = st.load(store.key, state_dir)
+    if store.private and not st.has_key():
+        out.status, out.error = "erro", "STATE_KEY não configurada: loja privada ignorada"
+        log.error(out.error)
+        return out
+    state = st.load(store.key, state_dir, private=store.private)
     fetcher = Fetcher(delay=store.delay, allowed_host=store.key)
     now_iso = now.isoformat(timespec="seconds")
 
@@ -56,7 +76,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
         out.requests = fetcher.requests
         out.seconds = time.monotonic() - t0
         if save:
-            st.save(store.key, state, state_dir)
+            st.save(store.key, state, state_dir, private=store.private)
         return out
 
     try:
@@ -68,10 +88,11 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
         scan = adapter.scan()
     except Exception as e:  # uma loja com problema não pode derrubar as outras
         state["errors"] = int(state.get("errors") or 0) + 1
-        out.status, out.error = "erro", str(e)
+        out.status, out.error = "erro", _mask(store, str(e))
         log.error(f"falhou ({state['errors']}ª vez seguida): {e}")
         if state["errors"] == settings.error_alert_after:
             out.alerts.append(Alert(kind=STORE_ERROR, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
+                                    private=store.private,
                                     note=f"{state['errors']} tentativas seguidas falharam. Último erro: {str(e)[:300]}"))
         if store.platform == "auto" and state["errors"] >= 3:
             state["platform"] = None  # tenta detectar a plataforma de novo
@@ -80,7 +101,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
     state["platform"] = platform
     if int(state.get("errors") or 0) >= settings.error_alert_after:
         out.alerts.append(Alert(kind=STORE_RECOVERED, store=store.name, store_url=store.url, store_key=store.key,
-                                store_tag=store.hashtag))
+                                store_tag=store.hashtag, private=store.private))
     state["errors"] = 0
     prev_status = state.get("status")
     state["status"] = out.status = scan.status
@@ -90,6 +111,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
         log.info("loja fechada com senha (/password)")
         if prev_status == "open" and store.alerts.store_status:
             out.alerts.append(Alert(kind=STORE_CLOSED, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
+                                    private=store.private,
                                     note="A loja foi fechada com senha. Pode ser lançamento chegando! 👀"))
         return finish()
 
@@ -100,6 +122,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
 
     if prev_status == "password" and store.alerts.store_status:
         out.alerts.append(Alert(kind=STORE_OPEN, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
+                                private=store.private,
                                 note=f"A loja reabriu com {out.available} produtos disponíveis."))
 
     if not state.get("baseline"):
@@ -121,7 +144,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
             try:
                 variants = adapter.fetch_variants(pid, p.url)
             except Exception as e:
-                log.warning(f"não consegui ler variantes de '{p.name}': {e}")
+                log.warning(f"não consegui ler variantes de {_pname(store, p.name)}: {e}")
                 continue
             if variants:
                 p.variants = variants
@@ -131,7 +154,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
 
     alerts, products = diff_products(store, state["products"], scan, now, fetched)
     state["products"] = products
-    alerts = _confirm_retractions(alerts, fetcher, log)
+    alerts = _confirm_retractions(alerts, fetcher, log, store)
     _fill_missing_photos(alerts, store, fetcher, log)
     out.alerts.extend(alerts)
     out.note = describe_counts(a.kind for a in alerts) or "sem novidades"
@@ -162,7 +185,7 @@ def _fill_missing_photos(alerts: List[Alert], store: StoreConfig, fetcher: Fetch
             a.image = logo
 
 
-def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log) -> List[Alert]:
+def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log, store: Optional[StoreConfig] = None) -> List[Alert]:
     """Só apaga o alerta se a página do produto der 404/410 (retirado de verdade).
 
     Página ainda no ar = a loja só escondeu o produto (ex.: esgotado): o alerta fica.
@@ -177,7 +200,8 @@ def _confirm_retractions(alerts: List[Alert], fetcher: Fetcher, log) -> List[Ale
             if re.search(r"HTTP (404|410)", str(e)):
                 confirmed.append(a)
                 removed.add(a.product_id)
-                log.info(f"'{a.name}' foi retirado do site (404): o alerta será apagado do grupo")
+                who = _pname(store, a.name) if store else f"'{a.name}'"
+                log.info(f"{who} foi retirado do site (404): o alerta será apagado do grupo")
     kept = [a for a in alerts if a.kind != RETRACT and not (a.kind == SOLD_OUT and a.product_id in removed)]
     return kept + confirmed
 
@@ -223,58 +247,106 @@ def run(settings: Settings, only: Optional[str] = None, dry_run: bool = False,
     return 1 if outcomes and all(o.error for o in outcomes) else 0
 
 
+# Grupos do Telegram: o principal (público) e, opcionalmente, um privado que recebe tudo.
+CHAT_ENV = {"principal": "TELEGRAM_CHAT_ID", "privado": "TELEGRAM_CHAT_ID_PRIVADO"}
+
+
+def _targets(a: Alert, chats: dict) -> List[str]:
+    """Loja privada → só o grupo privado; as demais → principal e privado (se existir)."""
+    if a.private:
+        return ["privado"] if "privado" in chats else []
+    return [k for k in ("principal", "privado") if k in chats]
+
+
+def _for_target(a: Alert, target: str) -> Optional[Alert]:
+    """"Esgotou"/apagar alerta respondem à mensagem daquele grupo; sem ela, não há o que fazer."""
+    if a.kind in (SOLD_OUT, RETRACT):
+        mid = a.reply_targets.get(target) or (a.reply_to if target == "principal" else None)
+        if not mid:
+            return None
+        a.reply_to = mid
+    return a
+
+
 def _deliver(alerts: List[Alert], settings: Settings, state_dir: Path, now: datetime):
+    chats = {k: os.environ[v] for k, v in CHAT_ENV.items() if os.environ.get(v)}
+    token = os.environ.get("TELEGRAM_TOKEN")
+    # sem o grupo principal configurado, os alertas vão para a fila e saem quando ele existir
+    routing = chats if "principal" in chats else {**chats, "principal": ""}
+    fresh = [replace(a, target=t) for a in alerts for t in _targets(a, routing)]
+    dropped = sum(1 for a in alerts if not _targets(a, routing))
+    if dropped:
+        logger.info(f"{dropped} alerta(s) sem grupo configurado (descartados)")
     pending = [a for a in st.load_outbox(state_dir) if _recent(a, now)]
+    for a in pending:
+        a.target = a.target or "principal"  # alertas antigos da fila eram do grupo principal
+    pending = [a for a in pending if a.target in routing]
     if pending:
         logger.info(f"reenviando {len(pending)} alerta(s) que falharam na rodada anterior")
-    queue = pending + alerts
-    token, chat_id = os.environ.get("TELEGRAM_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
+    queue = pending + fresh
+    if not token or "principal" not in chats:
         if queue:
             logger.warning(f"TELEGRAM_TOKEN/TELEGRAM_CHAT_ID não configurados: {len(queue)} alerta(s) guardado(s) para depois")
         st.save_outbox(queue[-OUTBOX_MAX_SIZE:], state_dir)
         return
-    tg = Telegram(token, chat_id, urgent_stock=settings.urgent_stock, show_stock=settings.show_stock)
-    try:  # o bot só funciona no grupo configurado: sai de qualquer outro
-        for chat in tg.leave_foreign_chats():
-            logger.warning(f"o bot foi adicionado a outro chat e saiu: {clean_text(chat)}")
-    except Exception as e:
-        logger.warning(f"verificação de chats do Telegram falhou: {tg.redact(str(e))}")
-    if not queue:
-        st.save_outbox([], state_dir)
-        return
-    try:
-        failed = tg.send_alerts(queue, settings.max_individual_alerts)
-    except Exception as e:  # nunca perder os alertas por um erro inesperado
-        logger.error(f"Telegram: {tg.redact(str(e))}")
-        failed = queue
-    if failed:
-        logger.warning(f"{len(failed)} alerta(s) não enviado(s); nova tentativa na próxima rodada")
-    else:
-        logger.info(f"{len(queue)} alerta(s) enviado(s) ao Telegram")
+    show = {"principal": settings.show_stock, "privado": settings.show_stock_private}
+    bots = {k: Telegram(token, cid, urgent_stock=settings.urgent_stock, show_stock=show[k])
+            for k, cid in chats.items()}
+    if settings.guard:  # o bot só funciona nos grupos configurados: sai de qualquer outro
+        try:
+            for chat in bots["principal"].leave_foreign_chats(allowed=list(chats.values())):
+                logger.warning(f"o bot foi adicionado a outro chat e saiu: {clean_text(chat)}")
+        except Exception as e:
+            logger.warning(f"verificação de chats do Telegram falhou: {bots['principal'].redact(str(e))}")
+    failed: List[Alert] = []
+    sent: List[Alert] = []
+    for key, tg in bots.items():
+        items = [x for x in (_for_target(a, key) for a in queue if a.target == key) if x is not None]
+        if not items:
+            continue
+        try:
+            failed_here = tg.send_alerts(items, settings.max_individual_alerts)
+        except Exception as e:  # nunca perder os alertas por um erro inesperado
+            logger.error(f"Telegram ({key}): {tg.redact(str(e))}")
+            failed_here = items
+        failed += failed_here
+        sent += [a for a in items if a not in failed_here]
+        logger.info(f"grupo {key}: {len(items) - len(failed_here)} alerta(s) enviado(s)"
+                    + (f", {len(failed_here)} para tentar de novo" if failed_here else ""))
     st.save_outbox(failed[-OUTBOX_MAX_SIZE:], state_dir)
-    _remember_messages([a for a in queue if a not in failed], state_dir, now)
+    _remember_messages(sent, settings, state_dir, now)
 
 
 ANNOUNCE_KINDS = {NEW, RESTOCK, VARIANT_RESTOCK, REPLENISH, LOW_STOCK}
 
 
-def _remember_messages(sent: List[Alert], state_dir: Path, now: datetime):
-    """Guarda qual mensagem anunciou cada produto (para apagar se ele for retirado, ou responder "esgotou")."""
+def _remember_messages(sent: List[Alert], settings: Settings, state_dir: Path, now: datetime):
+    """Guarda qual mensagem anunciou cada produto em cada grupo (para apagar se ele for
+    retirado do site, ou responder "esgotou")."""
+    private_keys = {s.key for s in settings.stores if s.private}
+    now_iso = now.isoformat(timespec="seconds")
     by_store: dict = {}
     for a in sent:
         if a.kind in ANNOUNCE_KINDS and a.available and a.message_id and a.store_key and a.product_id:
             by_store.setdefault(a.store_key, []).append(a)
     for key, items in by_store.items():
-        state = st.load(key, state_dir)
+        private = key in private_keys
+        if private and not st.has_key():
+            continue
+        state = st.load(key, state_dir, private=private)
         for a in items:
             rec = (state.get("products") or {}).get(a.product_id)
             if rec is None or not rec.get("available"):
                 continue
-            if a.kind == LOW_STOCK and rec.get("alert"):
+            current = rec.get("alert") or {}
+            if a.kind == LOW_STOCK and current and current.get("at") != now_iso:
                 continue  # "esgotou" responde ao anúncio original (novidade/restock), não ao "últimas unidades"
-            rec["alert"] = {"msg": a.message_id, "at": now.isoformat(timespec="seconds")}
-        st.save(key, state, state_dir)
+            if current.get("at") != now_iso:
+                current = {"at": now_iso, "msgs": {}}
+            current.setdefault("msgs", {})[a.target or "principal"] = a.message_id
+            current.pop("msg", None)
+            rec["alert"] = current
+        st.save(key, state, state_dir, private=private)
 
 
 def _recent(a: Alert, now: datetime) -> bool:
@@ -289,7 +361,7 @@ def _print_summary(outcomes: List[Outcome], n_alerts: int):
     logger.info(f"{'Loja':<22}{'Status':<9}{'Produtos':>9}{'Disp.':>7}{'Req.':>6}{'Tempo':>7}  Resultado")
     for o in outcomes:
         result = o.error[:60] if o.error else o.note
-        logger.info(f"{o.store.name[:21]:<22}{o.status:<9}{o.products:>9}{o.available:>7}{o.requests:>6}"
+        logger.info(f"{o.store.display[:21]:<22}{o.status:<9}{o.products:>9}{o.available:>7}{o.requests:>6}"
                     f"{o.seconds:>6.0f}s  {result}")
     logger.info(f"Total de alertas nesta rodada: {n_alerts}")
     logger.info("=" * 78)
@@ -300,7 +372,7 @@ def _print_summary(outcomes: List[Outcome], n_alerts: int):
                 "|---|---|---:|---:|---:|---:|---|"]
         for o in outcomes:
             result = f"❌ {o.error[:120]}" if o.error else o.note
-            rows.append(f"| {o.store.name} | {o.status} | {o.products} | {o.available} | {o.requests} "
+            rows.append(f"| {o.store.display} | {o.status} | {o.products} | {o.available} | {o.requests} "
                         f"| {o.seconds:.0f}s | {result} |")
         with open(summary_file, "a", encoding="utf-8") as f:
             f.write(f"### Polish Watcher — {n_alerts} alerta(s)\n\n" + "\n".join(rows) + "\n")
@@ -313,6 +385,9 @@ def _print_alerts(alerts: List[Alert], settings: Settings):
     logger.info(f"[dry-run] {len(alerts)} alerta(s) que seriam enviados:")
     for a in alerts:
         print("-" * 60)
+        if a.private and os.environ.get("GITHUB_ACTIONS"):
+            print("(alerta de loja privada: oculto no log público)")
+            continue
         print(caption(a, settings.urgent_stock, show_stock=settings.show_stock))
         if a.image:
             print(f"(foto: {a.image})")
@@ -323,8 +398,9 @@ def _github_output(outcomes: List[Outcome], alerts: List[Alert]):
     path = os.environ.get("GITHUB_OUTPUT")
     if not path:
         return
-    summary = describe_counts(a.kind for a in alerts) or "sem alertas"
-    errors = sum(1 for o in outcomes if o.error)
+    # a mensagem do commit é pública: não conta alertas de lojas privadas
+    summary = describe_counts(a.kind for a in alerts if not a.private) or "sem alertas"
+    errors = sum(1 for o in outcomes if o.error and not o.store.private)
     if errors:
         summary += f", {errors} loja(s) com erro"
     with open(path, "a", encoding="utf-8") as f:
