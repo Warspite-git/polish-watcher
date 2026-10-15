@@ -599,7 +599,7 @@
     "373376128": {"name": "Reluzente", "price": 65.0, "available": true, "stock": 23, "url": "https://www.lojawhatcha.com.br/produtos/reluzente-12zkh/", "first_seen": "2026-10-11"},
     "373376721": {"name": "Resoluta", "price": 65.0, "available": true, "stock": 21, "url": "https://www.lojawhatcha.com.br/produtos/resoluta-1h06w/", "first_seen": "2026-10-11", "nv": 1},
     "373377461": {"name": "Enfim, Luísa", "price": 65.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/enfim-luisa-wuurl/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-15T12:15:22+00:00", "msgs": {"principal": 147, "privado": 32}}, "posts": [{"at": "2026-10-15T12:15:22+00:00", "msgs": {"principal": 147, "privado": 32}}]},
-    "373440185": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 16, "url": "https://www.lojawhatcha.com.br/produtos/dvw-anaklusmos-uznhi/", "first_seen": "2026-10-11", "nv": 1},
+    "373440185": {"name": "DVW - Anaklusmos", "price": 65.0, "available": true, "stock": 15, "url": "https://www.lojawhatcha.com.br/produtos/dvw-anaklusmos-uznhi/", "first_seen": "2026-10-11", "nv": 1},
     "373442161": {"name": "DVW - Aunty Em's", "price": 65.0, "available": true, "stock": 22, "url": "https://www.lojawhatcha.com.br/produtos/aunty-ems-mepcv/", "first_seen": "2026-10-11"},
     "373442538": {"name": "DVW - Half Blood Camp", "price": 65.0, "available": true, "stock": 29, "url": "https://www.lojawhatcha.com.br/produtos/dvw-half-blood-camp-1mitf/", "first_seen": "2026-10-11"},
     "373442704": {"name": "DVW - Heroes Dreams", "price": 65.0, "available": true, "stock": 30, "url": "https://www.lojawhatcha.com.br/produtos/dvw-heroes-1sk4j/", "first_seen": "2026-10-11"},
