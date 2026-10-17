@@ -140,7 +140,7 @@
     "344314576": {"name": "Golden Carol", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/golden-carol-zgg5t/", "first_seen": "2026-10-11"},
     "344314577": {"name": "Frosted Dreams", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/frosted-dreams-0ui6z/", "first_seen": "2026-10-11"},
     "344314580": {"name": "Fir Forest", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/fir-forest-9wzsj/", "first_seen": "2026-10-11"},
-    "344314582": {"name": "Share Lights", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/fairy-lights-pg87y/", "first_seen": "2026-10-11"},
+    "344314582": {"name": "Share Lights", "price": 75.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/fairy-lights-pg87y/", "first_seen": "2026-10-11", "nv": 1},
     "344314583": {"name": "Crystal Eve", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/crystal-eve-yfw0r/", "first_seen": "2026-10-11"},
     "344314585": {"name": "Cozy Night", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/cozy-night-vbg5f/", "first_seen": "2026-10-11"},
     "344314587": {"name": "Christmas Spirit", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/christmas-spirit-4as16/", "first_seen": "2026-10-11"},
