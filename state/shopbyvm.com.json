@@ -10,7 +10,7 @@
     "342093092": {"name": "V-Skin 30gr", "price": 32.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/v-skin-30gr/", "first_seen": "2026-10-11"},
     "342094129": {"name": "Chaveiro Nail Guard VM", "price": 25.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/chaveiro-nail-guard-vm/", "first_seen": "2026-10-11"},
     "342103928": {"name": "FideLIsa", "price": 70.0, "available": true, "stock": 10, "url": "https://www.shopbyvm.com/produtos/fidelisa/", "first_seen": "2026-10-11"},
-    "342104109": {"name": "EternIsa", "price": 70.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/eternisa/", "first_seen": "2026-10-11"},
+    "342104109": {"name": "EternIsa", "price": 70.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/eternisa/", "first_seen": "2026-10-11"},
     "342104269": {"name": "ValorIsa", "price": 70.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/valorisa/", "first_seen": "2026-10-11"},
     "342104764": {"name": "VibrantIsa", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/vibrantisa/", "first_seen": "2026-10-11"},
     "342106139": {"name": "PoderIsa", "price": 70.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/poderisa/", "first_seen": "2026-10-11"},
@@ -175,7 +175,7 @@
     "353102957": {"name": "Crazy Box 30 esmaltes", "price": 950.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/crazy-box-30-esmaltes/", "first_seen": "2026-10-11"},
     "354314217": {"name": "Blue Serenity", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/blue-serenity/", "first_seen": "2026-10-11"},
     "354314271": {"name": "Cloud Nine Paws", "price": 70.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/cloud-nine-paws/", "first_seen": "2026-10-11"},
-    "354314333": {"name": "Heavenly Fur (Topper Magnetico/Holográfico/Refletivo)", "price": 70.0, "available": true, "stock": 10, "url": "https://www.shopbyvm.com/produtos/heavenly-fur-topper-magnetico-holografico-refletivo/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-17T00:00:30+00:00", "msgs": {"principal": 153, "privado": 40}}, "posts": [{"at": "2026-10-17T00:00:30+00:00", "msgs": {"principal": 153, "privado": 40}}]},
+    "354314333": {"name": "Heavenly Fur (Topper Magnetico/Holográfico/Refletivo)", "price": 70.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/heavenly-fur-topper-magnetico-holografico-refletivo/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-17T00:00:30+00:00", "msgs": {"principal": 153, "privado": 40}}, "posts": [{"at": "2026-10-17T00:00:30+00:00", "msgs": {"principal": 153, "privado": 40}}]},
     "354314410": {"name": "Lilac Halo", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/lilac-halo/", "first_seen": "2026-10-11"},
     "354314514": {"name": "Minty Guardian", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/minty-guardian/", "first_seen": "2026-10-11"},
     "354314720": {"name": "Mystic Aura (Topper Flake Matte)", "price": 70.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/mystic-aura-topper-flake-matte/", "first_seen": "2026-10-11"},
@@ -218,7 +218,7 @@
     "359909839": {"name": "Coleção Dragon Warrior", "price": 900.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/colecao-dragon-warrior-vryax/", "first_seen": "2026-10-11"},
     "360417340": {"name": "Imã \"Aurora Cat-Eye\"", "price": 32.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/ima-aurora-cat-eye-1rkml/", "first_seen": "2026-10-11"},
     "361431871": {"name": "Imã Starkiss", "price": 38.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/starkiss-wh3of/", "first_seen": "2026-10-11"},
-    "361432594": {"name": "Caneta Magnética Precision Stylus.", "price": 29.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/caneta-magnetica-precision-stylus-16097/", "first_seen": "2026-10-11"},
+    "361432594": {"name": "Caneta Magnética Precision Stylus.", "price": 29.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/caneta-magnetica-precision-stylus-16097/", "first_seen": "2026-10-11"},
     "361435498": {"name": "Kit Imã Essencial", "price": 89.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/kit-ima-essencial-9ifwl/", "first_seen": "2026-10-11"},
     "361489281": {"name": "Bastão Magnético Esculptor NailArt Pro", "price": 36.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/bastao-magnetico-esculptor-nailart-pro-15ckb/", "first_seen": "2026-10-11"},
     "361489960": {"name": "Anel Ursinho (Efeito Coração / Olho de Gato) + Starkiss (Efeito Estrela)", "price": 68.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/anel-ursinho-efeito-coracao-olho-de-gato-starkiss-efeito-estrela-1hepg/", "first_seen": "2026-10-11"},
@@ -280,9 +280,9 @@
     "371835727": {"name": "Coleção Hallow Isa", "price": 1120.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/colecao-hallow-isa-11u6p/", "first_seen": "2026-10-11", "nv": 2, "variants": {"1611573785": {"name": "8ml vidro caveira", "available": true, "stock": 4}, "1611573786": {"name": "11 ml vidro redondo tradicional", "available": true, "stock": 3}}, "variants_checked": "2026-10-16T23:15:25+00:00"},
     "371836450": {"name": "Zombie Free 2.0", "price": 89.0, "available": true, "stock": 13, "url": "https://www.shopbyvm.com/produtos/zombie-free-2-0-nuqwk/", "first_seen": "2026-10-11"},
     "371838423": {"name": "Scrub Zombie", "price": 52.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/srub-zombie-ymu02/", "first_seen": "2026-10-11"},
-    "371839182": {"name": "Base Fortalecedora 3.0", "price": 45.0, "available": true, "stock": 20, "url": "https://www.shopbyvm.com/produtos/base-fortalecedora-3-0-1f2ge/", "first_seen": "2026-10-11"},
+    "371839182": {"name": "Base Fortalecedora 3.0", "price": 45.0, "available": true, "stock": 19, "url": "https://www.shopbyvm.com/produtos/base-fortalecedora-3-0-1f2ge/", "first_seen": "2026-10-11"},
     "371840744": {"name": "Golden Elixir Serum bi fasico", "price": 89.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/golden-elixir-serum-bi-fasico-1drkz/", "first_seen": "2026-10-11"},
-    "372390810": {"name": "Diamond Gel Risqué", "price": 18.0, "available": true, "stock": 10, "url": "https://www.shopbyvm.com/produtos/diamond-gel-risque-i3rmg/", "first_seen": "2026-10-11"},
+    "372390810": {"name": "Diamond Gel Risqué", "price": 18.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/diamond-gel-risque-i3rmg/", "first_seen": "2026-10-11"},
     "374283828": {"name": "Carimbo de Unhas", "price": 42.0, "available": true, "stock": 20, "url": "https://www.shopbyvm.com/produtos/carimbo-de-unhas-1er2c/", "first_seen": "2026-10-14", "nv": 2, "variants": {"1619143863": {"name": "Redondo com strass", "available": true, "stock": 10}, "1619143864": {"name": "Quadrado", "available": true, "stock": 10}}, "variants_checked": "2026-10-16T23:30:29+00:00", "alert": {"at": "2026-10-14T23:00:32+00:00", "msgs": {"principal": 142, "privado": 26}}}
   }
 }
