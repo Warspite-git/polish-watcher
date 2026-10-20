@@ -82,7 +82,7 @@
     "16909965": {"name": "Sim Sala Bim", "price": 70.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/sim-sala-bim/", "first_seen": "2026-10-11"},
     "16914350": {"name": "Galaxy 5Free", "price": 49.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/galaxy-5free/", "first_seen": "2026-10-11"},
     "19540564": {"name": "Abre-te Sésamo", "price": 70.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/abre-te-sesamo/", "first_seen": "2026-10-11"},
-    "20540783": {"name": "Fecha-te Sésamo", "price": 70.0, "available": true, "stock": 5, "url": "https://www.lojawhatcha.com.br/produtos/fecha-te-sesamo/", "first_seen": "2026-10-11"},
+    "20540783": {"name": "Fecha-te Sésamo", "price": 70.0, "available": true, "stock": 4, "url": "https://www.lojawhatcha.com.br/produtos/fecha-te-sesamo/", "first_seen": "2026-10-11"},
     "20540823": {"name": "Poção do amor", "price": 70.0, "available": true, "stock": 2, "url": "https://www.lojawhatcha.com.br/produtos/pocao-do-amor/", "first_seen": "2026-10-11"},
     "24303191": {"name": "Aurora Boreal", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/aurora-boreal-10-ml/", "first_seen": "2026-10-11"},
     "24303249": {"name": "Aurora Boreal (F)", "price": 65.0, "available": true, "stock": 2, "url": "https://www.lojawhatcha.com.br/produtos/aurora-boreal-f-10ml/", "first_seen": "2026-10-11"},
@@ -479,7 +479,7 @@
     "288007635": {"name": "Festive Fern", "price": 65.0, "available": true, "stock": 12, "url": "https://www.lojawhatcha.com.br/produtos/festive-fern/", "first_seen": "2026-10-11"},
     "288008239": {"name": "Gala Rouge", "price": 65.0, "available": true, "stock": 13, "url": "https://www.lojawhatcha.com.br/produtos/gala-rouge/", "first_seen": "2026-10-11"},
     "288008638": {"name": "Holoversary", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/holoversary/", "first_seen": "2026-10-11"},
-    "288008985": {"name": "Lava Lights", "price": 65.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/lava-lights/", "first_seen": "2026-10-11"},
+    "288008985": {"name": "Lava Lights", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/lava-lights/", "first_seen": "2026-10-11"},
     "288009178": {"name": "Lavender Partycake", "price": 65.0, "available": true, "stock": 31, "url": "https://www.lojawhatcha.com.br/produtos/lavender-partycake/", "first_seen": "2026-10-11"},
     "288009341": {"name": "Moon Wish", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/moon-wish/", "first_seen": "2026-10-11"},
     "288009590": {"name": "Nebula Party", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/nebula-party/", "first_seen": "2026-10-11"},
@@ -623,7 +623,7 @@
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 32, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
     "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 6, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1},
     "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1},
-    "374285821": {"name": "PRÉ VENDA! Hera - Envios após 30/10", "price": 75.0, "available": true, "stock": 24, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hera-envios-apos-30-10-zhy7j/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 145, "privado": 29}}},
+    "374285821": {"name": "PRÉ VENDA! Hera - Envios após 30/10", "price": 75.0, "available": true, "stock": 23, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hera-envios-apos-30-10-zhy7j/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 145, "privado": 29}}},
     "374286442": {"name": "PRÉ VENDA! Hestia - Envios após 30/10", "price": 75.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hestia-envios-apos-30-10-f55z2/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 146, "privado": 30}}},
     "374331847": {"name": "DVW - Advent Calendar 2026 (PRÉ VENDA - ENVIOS 15/11)", "price": 900.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/dvw-advent-calendar-2026-1mjrs/", "first_seen": "2026-10-15", "nv": 1, "alert": {"at": "2026-10-15T12:15:22+00:00", "msgs": {"principal": 148, "privado": 33}}}
   }
