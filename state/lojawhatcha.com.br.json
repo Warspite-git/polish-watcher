@@ -2,7 +2,7 @@
   "platform": "nuvemshop",
   "baseline": "2026-10-11T02:10:19+00:00",
   "status": "open",
-  "errors": 1,
+  "errors": 0,
   "products": {
     "15394232": {"name": "Argent 5free", "price": 65.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/argent-5free/", "first_seen": "2026-10-11"},
     "15439136": {"name": "Noir - 5free", "price": 65.0, "available": true, "stock": 2, "url": "https://www.lojawhatcha.com.br/produtos/noir-5free/", "first_seen": "2026-10-11"},

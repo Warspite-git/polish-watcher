@@ -2,7 +2,7 @@
   "platform": "nuvemshop",
   "baseline": "2026-10-11T02:10:19+00:00",
   "status": "open",
-  "errors": 1,
+  "errors": 0,
   "products": {
     "216497246": {"name": "Hot Shower", "price": 33.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/hot-shower/", "first_seen": "2026-10-11"},
     "216498817": {"name": "Sweater", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/sweater/", "first_seen": "2026-10-11"},
