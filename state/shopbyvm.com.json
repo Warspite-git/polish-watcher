@@ -2,7 +2,7 @@
   "platform": "nuvemshop",
   "baseline": "2026-10-11T03:13:03+00:00",
   "status": "open",
-  "errors": 0,
+  "errors": 1,
   "products": {
     "342090083": {"name": "Zombie Free 30ML", "price": 89.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/zombie-free-30ml/", "first_seen": "2026-10-11"},
     "342090618": {"name": "Cuticle Recovery 30ml", "price": 89.0, "available": true, "stock": 8, "url": "https://www.shopbyvm.com/produtos/cuticle-recovery-30ml/", "first_seen": "2026-10-11"},
