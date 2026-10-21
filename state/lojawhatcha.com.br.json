@@ -92,7 +92,7 @@
     "24303465": {"name": "Aurora Polar (F)", "price": 65.0, "available": true, "stock": 3, "url": "https://www.lojawhatcha.com.br/produtos/aurora-polar-f-10ml/", "first_seen": "2026-10-11"},
     "25397707": {"name": "100 Esferas Inox - 5mm", "price": 18.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/100-esferas-inox-5mm/", "first_seen": "2026-10-11"},
     "25397710": {"name": "20 Esferas Inox - 5mm", "price": 4.0, "available": true, "stock": 10, "url": "https://www.lojawhatcha.com.br/produtos/20-esferas-inox-5mm/", "first_seen": "2026-10-11"},
-    "26265730": {"name": "Top Glitter - 5Free", "price": 30.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/top-glitter-5free/", "first_seen": "2026-10-11"},
+    "26265730": {"name": "Top Glitter - 5Free", "price": 30.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/top-glitter-5free/", "first_seen": "2026-10-11"},
     "26485811": {"name": "Foliage (F)", "price": 65.0, "available": true, "stock": 1, "url": "https://www.lojawhatcha.com.br/produtos/foliage-f/", "first_seen": "2026-10-11"},
     "26485827": {"name": "Foliage", "price": 65.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/foliage-5free/", "first_seen": "2026-10-11"},
     "28455770": {"name": "Labial Rosa", "price": 70.0, "available": true, "stock": 6, "url": "https://www.lojawhatcha.com.br/produtos/labial-rosa/", "first_seen": "2026-10-11"},
@@ -583,7 +583,7 @@
     "361387176": {"name": "Against the Odds", "price": 65.0, "available": true, "stock": 11, "url": "https://www.lojawhatcha.com.br/produtos/against-the-odds-1l7eq/", "first_seen": "2026-10-11", "nv": 1},
     "361387638": {"name": "Serendipity", "price": 65.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/serendipity-n5lfd/", "first_seen": "2026-10-11"},
     "361387947": {"name": "By Chance", "price": 65.0, "available": true, "stock": 36, "url": "https://www.lojawhatcha.com.br/produtos/by-chance-1ifq4/", "first_seen": "2026-10-11"},
-    "361388270": {"name": "Stroke of Luck", "price": 65.0, "available": true, "stock": 3, "url": "https://www.lojawhatcha.com.br/produtos/stroke-of-luck-4equf/", "first_seen": "2026-10-11"},
+    "361388270": {"name": "Stroke of Luck", "price": 65.0, "available": true, "stock": 2, "url": "https://www.lojawhatcha.com.br/produtos/stroke-of-luck-4equf/", "first_seen": "2026-10-11"},
     "361388512": {"name": "Finges Crossed", "price": 65.0, "available": true, "stock": 32, "url": "https://www.lojawhatcha.com.br/produtos/finges-crossed-1f0fu/", "first_seen": "2026-10-11"},
     "361388669": {"name": "Luck of the Draw", "price": 65.0, "available": true, "stock": 16, "url": "https://www.lojawhatcha.com.br/produtos/luck-of-the-draw-1hcb1/", "first_seen": "2026-10-11"},
     "361388938": {"name": "Begginer's Luck", "price": 65.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/begginers-luck-1qdpg/", "first_seen": "2026-10-11"},
@@ -623,8 +623,8 @@
     "373451679": {"name": "Stone Sentinel", "price": 65.0, "available": true, "stock": 32, "url": "https://www.lojawhatcha.com.br/produtos/stone-sentinel-1t9pn/", "first_seen": "2026-10-11"},
     "373486397": {"name": "Mischief Month", "price": 0.0, "available": true, "stock": 22, "url": "https://www.lojawhatcha.com.br/produtos/mischief-month-1mrbw/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-20T20:30:31+00:00", "msgs": {"principal": 183, "privado": 127}}, "posts": [{"at": "2026-10-20T20:30:31+00:00", "msgs": {"principal": 183, "privado": 127}}]},
     "373486827": {"name": "Doces ou travessuras?", "price": 0.0, "available": false, "stock": 0, "url": "https://www.lojawhatcha.com.br/produtos/doces-ou-travessuras-wvp3p/", "first_seen": "2026-10-11", "nv": 1},
-    "374285821": {"name": "PRÉ VENDA! Hera - Envios após 30/10", "price": 75.0, "available": true, "stock": 20, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hera-envios-apos-30-10-zhy7j/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 145, "privado": 29}}},
-    "374286442": {"name": "PRÉ VENDA! Hestia - Envios após 30/10", "price": 75.0, "available": true, "stock": 15, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hestia-envios-apos-30-10-f55z2/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 146, "privado": 30}}},
+    "374285821": {"name": "PRÉ VENDA! Hera - Envios após 30/10", "price": 75.0, "available": true, "stock": 19, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hera-envios-apos-30-10-zhy7j/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 145, "privado": 29}}},
+    "374286442": {"name": "PRÉ VENDA! Hestia - Envios após 30/10", "price": 75.0, "available": true, "stock": 14, "url": "https://www.lojawhatcha.com.br/produtos/pre-venda-hestia-envios-apos-30-10-f55z2/", "first_seen": "2026-10-14", "nv": 1, "alert": {"at": "2026-10-14T23:15:25+00:00", "msgs": {"principal": 146, "privado": 30}}},
     "374331847": {"name": "DVW - Advent Calendar 2026 (PRÉ VENDA - ENVIOS 15/11)", "price": 900.0, "available": true, "stock": 34, "url": "https://www.lojawhatcha.com.br/produtos/dvw-advent-calendar-2026-1mjrs/", "first_seen": "2026-10-15", "nv": 1, "alert": {"at": "2026-10-15T12:15:22+00:00", "msgs": {"principal": 148, "privado": 33}}}
   }
 }
