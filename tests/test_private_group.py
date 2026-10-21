@@ -167,3 +167,14 @@ def test_store_turned_private_migrates_its_open_state(tmp_path, monkeypatch):
     assert [f.suffix for f in tmp_path.iterdir()] == [".bin"]
     assert b"Esmalte" not in next(tmp_path.iterdir()).read_bytes()
     assert st.load("movida.test", tmp_path, private=True) == saved
+
+
+def test_variant_stock_only_in_private_group():
+    """O grupo público não mostra estoque, nem o das variantes ("8ml vidro caveira (5)")."""
+    from monitor.models import Alert
+    from monitor.telegram import caption
+    a = Alert(kind="variant_restock", store="Loja", store_url="https://l.test", name="Esmalte", url="https://l.test/e",
+              price=80.0, stock=10, variants=["8ml vidro caveira", "Mini"], variant_stock=[5, None])
+    public, private = caption(a, 5, show_stock=False), caption(a, 5, show_stock=True)
+    assert "🎨 8ml vidro caveira, Mini" in public and "(5)" not in public and "10 unidades" not in public
+    assert "🎨 8ml vidro caveira (5), Mini" in private and "10 unidades" in private

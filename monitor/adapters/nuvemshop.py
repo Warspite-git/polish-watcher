@@ -15,6 +15,7 @@ from __future__ import annotations
 import html
 import json
 import re
+import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
@@ -24,6 +25,7 @@ from .base import Adapter, AdapterError
 
 MAX_PAGES = 300
 SIZE_RETRIES = 2  # novas leituras quando o servidor muda o tamanho das páginas no meio
+REPEAT_RETRY_PAUSE = 3  # segundos antes de pedir de novo uma página que veio repetida
 
 ITEM_RE = re.compile(r'data-product-id="(\d+)"')
 LD_RE = re.compile(r"<script[^>]*application/ld\+json[^>]*structured-data\.item[^>]*>(.*?)</script>", re.S)
@@ -86,6 +88,8 @@ class NuvemshopAdapter(Adapter):
             if is_password_page(resp.url):
                 return ScanResult(status="password"), True
             items, errors = parse_listing(resp.text)
+            if items and all(p.id in products for p in items):
+                items, errors = self._retry_repeated(page, items, errors)
             if errors:
                 self.log.warning(f"página {page}: {errors} produto(s) com JSON ilegível; varredura incompleta")
                 complete = False
@@ -94,13 +98,12 @@ class NuvemshopAdapter(Adapter):
                     raise AdapterError("nenhum produto encontrado na listagem (loja vazia ou tema não suportado)")
                 break
             sizes.append(len(items))
-            new_ids = [p.id for p in items if p.id not in products]
-            for p in items:
-                products[p.id] = p
-            if not new_ids:
+            if all(p.id in products for p in items):  # repetida mesmo sem cache: não sobrescreve o que já leu
                 self.log.warning(f"página {page} repetiu produtos já vistos; varredura incompleta")
                 complete = False
                 break
+            for p in items:
+                products[p.id] = p
         else:
             self.log.warning(f"parou no limite de {MAX_PAGES} páginas; varredura incompleta")
             complete = False
@@ -111,6 +114,19 @@ class NuvemshopAdapter(Adapter):
             self.log.warning(f"tamanho das páginas variou ({sizes}); varredura incompleta")
             complete = False
         return ScanResult(status="open", products=products, complete=complete), sizes_ok
+
+    def _retry_repeated(self, page: int, items: list, errors: int) -> Tuple[list, int]:
+        """A plataforma às vezes devolve, por cache, uma página que já veio (aconteceu em várias
+        lojas ao mesmo tempo). Pede de novo uma vez, com um parâmetro que evita o cache."""
+        self.log.info(f"página {page} veio repetida; pedindo de novo sem cache")
+        time.sleep(REPEAT_RETRY_PAUSE)
+        try:
+            resp = self.fetcher.get(f"{self._listing_url(page)}&_={int(time.time())}")
+        except FetchError:
+            return items, errors
+        if is_password_page(resp.url):
+            return items, errors
+        return parse_listing(resp.text)
 
     def fetch_variants(self, product_id: str, url: str) -> Optional[Dict[str, Variant]]:
         resp = self.fetcher.get(url)

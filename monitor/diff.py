@@ -109,12 +109,12 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
                 if p.image is None and p.available and PHOTO_WAIT_ROUNDS:
                     products[pid]["photo_wait"] = 1
                 else:
-                    alerts.append(_alert(NEW, store, p, variants=_available_variants(p)))
+                    alerts.append(_alert(NEW, store, p, **_variant_fields(_available_variants(p))))
             continue
 
         if prev.get("photo_wait"):  # produto novo que estava esperando a foto
             if p.available and (p.image or prev["photo_wait"] >= PHOTO_WAIT_ROUNDS):
-                alerts.append(_alert(NEW, store, p, variants=_available_variants(p)))
+                alerts.append(_alert(NEW, store, p, **_variant_fields(_available_variants(p))))
             elif p.available:
                 products[pid]["photo_wait"] = prev["photo_wait"] + 1
             continue
@@ -126,13 +126,13 @@ def diff_products(store: StoreConfig, prev_products: Dict[str, dict], scan: Scan
         if not was_available and p.available:
             if cfg.restock:
                 note = "Voltou ao catálogo da loja" if prev.get("missing") else ""
-                alerts.append(_alert(RESTOCK, store, p, variants=_available_variants(p), note=note))
+                alerts.append(_alert(RESTOCK, store, p, **_variant_fields(_available_variants(p)), note=note))
         elif was_available and p.available and cfg.restock and p.variants and prev.get("variants"):
             old_vars = prev["variants"]
             back = [v for vid, v in p.variants.items()
                     if v.available and (vid not in old_vars or not old_vars[vid].get("available"))]
             if back:
-                alerts.append(_alert(VARIANT_RESTOCK, store, p, variants=[_variant_label(v) for v in back]))
+                alerts.append(_alert(VARIANT_RESTOCK, store, p, **_variant_fields(back)))
                 variant_back = True
 
         # Reposição: chegaram mais unidades num produto que não chegou a esgotar (ex.: 3 → 30)
@@ -234,15 +234,16 @@ def sold_out_note(sent: Optional[dict], now: datetime) -> Optional[str]:
     return f"Esgotou em menos de {hours} hora{'s' if hours > 1 else ''}"
 
 
-def _variant_label(v: Variant) -> str:
-    label = v.name or "única"
-    return f"{label} ({v.stock})" if isinstance(v.stock, int) else label
+def _variant_fields(variants: List[Variant]) -> dict:
+    """Nomes das variantes e, à parte, o estoque de cada uma: o grupo público não mostra estoque."""
+    return {"variants": [v.name or "única" for v in variants],
+            "variant_stock": [v.stock if isinstance(v.stock, int) else None for v in variants]}
 
 
-def _available_variants(p: Product) -> List[str]:
+def _available_variants(p: Product) -> List[Variant]:
     if not p.variants or len(p.variants) < 2:
         return []
-    return [_variant_label(v) for v in p.variants.values() if v.available]
+    return [v for v in p.variants.values() if v.available]
 
 
 def _older_than(iso: Optional[str], now: datetime, hours: float) -> bool:

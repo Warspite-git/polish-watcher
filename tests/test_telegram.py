@@ -389,3 +389,16 @@ def test_guard_keeps_configured_group_that_became_supergroup(monkeypatch):
     tg = GuardTelegram([added(1, -1004457, "supergroup", "administrator"), added(2, -999)])
     tg.leave_foreign_chats(allowed=["-5597"])  # o privado estava configurado com o ID antigo
     assert tg.left == ["-999"]  # não sai do grupo privado convertido; sai do grupo estranho
+
+
+def test_photo_conversion_only_parses_webp():
+    import io
+    from PIL import Image
+    from monitor.telegram import _as_jpeg
+    def encoded(fmt):
+        out = io.BytesIO()
+        Image.new("RGB", (4, 4), "red").save(out, fmt)
+        return out.getvalue()
+    assert _as_jpeg(encoded("WEBP"))[:3] == b"\xff\xd8\xff"  # webp vira JPEG
+    tiff = encoded("TIFF")
+    assert _as_jpeg(tiff) == tiff                             # outros formatos nem são abertos

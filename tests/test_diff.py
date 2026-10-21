@@ -79,14 +79,14 @@ def test_variant_restock():
     old = baseline(scan(prod("1", stock=5, variants=v_old)), NOW)
     alerts, _ = diff_products(store(), old, scan(prod("1", stock=7, variants=v_new)), NOW)
     assert kinds(alerts) == ["variant_restock"]
-    assert alerts[0].variants == ["Mini (3)"]
+    assert alerts[0].variants == ["Mini"] and alerts[0].variant_stock == [3]
 
 
 def test_restock_lists_available_variants():
     old = baseline(scan(prod("1", available=False, stock=0)), NOW)
     v = {"10": Variant("10", "Mini", True, 2), "11": Variant("11", "Full", False, 0)}
     alerts, state = diff_products(store(), old, scan(prod("1", stock=2, variants=v)), NOW, variants_from_page={"1"})
-    assert alerts[0].kind == "restock" and alerts[0].variants == ["Mini (2)"]
+    assert alerts[0].kind == "restock" and alerts[0].variants == ["Mini"] and alerts[0].variant_stock == [2]
     assert state["1"]["nv"] == 2 and "variants_checked" in state["1"]
 
 

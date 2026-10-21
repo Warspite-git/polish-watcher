@@ -186,3 +186,30 @@ def test_scan_rereads_when_page_size_changes_mid_scan():
 def test_placeholder_image_means_no_photo():
     assert jpg_image("https://acdn-us.mitiendanube.com/assets/stores/img/no-photo-480-0.webp") is None
     assert jpg_image("//acdn-us.mitiendanube.com/assets/themes/x/static/images/empty-placeholder.png") is None
+
+
+class StaleCacheFetcher(FakeFetcher):
+    """A página 3 vem do cache com o conteúdo da página 2; sem cache (parâmetro "_=") vem certa."""
+    def __init__(self, pages, fixed_without_cache=True):
+        super().__init__(pages)
+        self.fixed = fixed_without_cache
+
+    def get(self, url):
+        if "/page/3/" in url and not ("&_=" in url and self.fixed):
+            url = url.replace("/page/3/", "/page/2/")
+        return super().get(url)
+
+
+def test_repeated_page_is_requested_again_without_cache(monkeypatch):
+    import monitor.adapters.nuvemshop as nv
+    monkeypatch.setattr(nv, "REPEAT_RETRY_PAUSE", 0)
+    f = StaleCacheFetcher([10, 10, 10, 4])
+    res = adapter(f).scan()
+    assert res.complete and len(res.products) == 34 and f.requests == 6  # 5 páginas + 1 repetição
+
+
+def test_page_still_repeated_after_retry_is_incomplete(monkeypatch):
+    import monitor.adapters.nuvemshop as nv
+    monkeypatch.setattr(nv, "REPEAT_RETRY_PAUSE", 0)
+    res = adapter(StaleCacheFetcher([10, 10, 10, 4], fixed_without_cache=False)).scan()
+    assert not res.complete and len(res.products) == 20

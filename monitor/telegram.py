@@ -136,7 +136,7 @@ def caption(a: Alert, urgent_stock: int = 5, with_link: bool = False, show_stock
         return "\n".join(lines)
     lines.append(f"<b>{esc(_cut(a.name, 200))}</b>")
     if a.variants:
-        lines.append("🎨 " + esc(_cut(", ".join(a.variants), 300)))
+        lines.append("🎨 " + esc(_cut(", ".join(variant_labels(a, show_stock)), 300)))
     if a.kind == PRICE and a.old_price is not None:
         price = f"💰 <s>{brl(a.old_price)}</s> → <b>{brl(a.price)}</b>"
     else:
@@ -174,6 +174,13 @@ def buttons(a: Alert, urgent_stock: int = 5) -> Optional[dict]:
         row.append({"text": "🏪 Ver a loja", "url": a.store_url})
     row = [b for b in row if str(b["url"]).startswith(("https://", "http://"))]
     return {"inline_keyboard": [row]} if row else None
+
+
+def variant_labels(a: Alert, show_stock: bool = True) -> List[str]:
+    """Nomes das variantes; o estoque de cada uma ("Mini (3)") só onde o estoque é mostrado."""
+    stocks = a.variant_stock if show_stock else []
+    return [f"{name} ({stocks[i]})" if i < len(stocks) and isinstance(stocks[i], int) else name
+            for i, name in enumerate(a.variants)]
 
 
 def compact_line(a: Alert, index: Optional[int] = None, urgent_stock: int = 5, show_stock: bool = True) -> str:
@@ -585,7 +592,9 @@ def _as_jpeg(content: bytes) -> bytes:
     try:
         from PIL import Image
         Image.MAX_IMAGE_PIXELS = 40_000_000  # recusa imagens absurdamente grandes
-        with Image.open(io.BytesIO(content)) as img:
+        # só .webp (o único formato que precisa de conversão): os outros leitores do Pillow
+        # (TIFF, EPS, PDF...) nem são usados, então falhas neles não afetam o monitor
+        with Image.open(io.BytesIO(content), formats=["WEBP"]) as img:
             out = io.BytesIO()
             img.convert("RGB").save(out, "JPEG", quality=90)
             return out.getvalue()

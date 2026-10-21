@@ -98,7 +98,8 @@ class Alert:
     old_stock: Optional[int] = None
     stock: Optional[int] = None
     available: bool = True
-    variants: List[str] = field(default_factory=list)
+    variants: List[str] = field(default_factory=list)  # nomes das variantes
+    variant_stock: List[Optional[int]] = field(default_factory=list)  # estoque de cada uma (só no grupo privado)
     note: str = ""
     created: str = ""
     store_key: str = ""            # domínio da loja (arquivo de estado)
