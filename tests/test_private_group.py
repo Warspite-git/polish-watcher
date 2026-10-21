@@ -178,3 +178,16 @@ def test_variant_stock_only_in_private_group():
     public, private = caption(a, 5, show_stock=False), caption(a, 5, show_stock=True)
     assert "🎨 8ml vidro caveira, Mini" in public and "(5)" not in public and "10 unidades" not in public
     assert "🎨 8ml vidro caveira (5), Mini" in private and "10 unidades" in private
+
+
+def test_read_problems_never_go_to_public_group():
+    from monitor.models import Alert
+    from monitor.runner import _targets
+    chats = {"principal": "-1", "privado": "-2"}
+    def a(kind):
+        return Alert(kind=kind, store="Loja", store_url="https://l.test")
+    assert _targets(a("store_error"), chats) == ["privado"]
+    assert _targets(a("store_recovered"), chats) == ["privado"]
+    assert _targets(a("store_error"), {"principal": "-1"}) == []  # sem grupo privado: não posta em lugar nenhum
+    assert _targets(a("store_open"), chats) == ["principal", "privado"]
+    assert _targets(a("store_closed"), chats) == ["principal", "privado"]

@@ -263,9 +263,13 @@ def run(settings: Settings, only: Optional[str] = None, dry_run: bool = False,
 CHAT_ENV = {"principal": "TELEGRAM_CHAT_ID", "privado": "TELEGRAM_CHAT_ID_PRIVADO"}
 
 
+# problemas de leitura de uma loja não são assunto do grupo público
+PRIVATE_ONLY_KINDS = {STORE_ERROR, STORE_RECOVERED}
+
+
 def _targets(a: Alert, chats: dict) -> List[str]:
-    """Loja privada → só o grupo privado; as demais → principal e privado (se existir)."""
-    if a.private:
+    """Loja privada ou problema de leitura → só o grupo privado; o resto → principal e privado."""
+    if a.private or a.kind in PRIVATE_ONLY_KINDS:
         return ["privado"] if "privado" in chats else []
     return [k for k in ("principal", "privado") if k in chats]
 
