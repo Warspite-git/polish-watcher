@@ -124,7 +124,7 @@ def process_store(store: StoreConfig, settings: Settings, now: datetime, state_d
     if prev_status == "password" and store.alerts.store_status:
         out.alerts.append(Alert(kind=STORE_OPEN, store=store.name, store_url=store.url, store_key=store.key, store_tag=store.hashtag,
                                 private=store.private,
-                                note=f"A loja reabriu com {out.available} produtos disponíveis."))
+                                note="A loja reabriu."))  # sem contar produtos: quantidades não são divulgadas
 
     if not state.get("baseline"):
         if not scan.complete:

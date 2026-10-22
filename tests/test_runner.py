@@ -306,3 +306,13 @@ def test_digest_message_shared_by_many_products_is_never_deleted(tmp_path):
     products = st.load("f.test", tmp_path)["products"]
     assert all("posts" not in products[i] for i in ("0", "1"))
     assert products["0"]["alert"]["msgs"] == {"principal": 777}  # "esgotou" ainda pode responder ao resumo
+
+
+def test_store_open_alert_does_not_reveal_product_count(env):
+    import re
+    settings, state_dir = env
+    FakeAdapter.script = [ScanResult(status="password"), open_scan(("1", True), ("2", True))]
+    runner.process_store(settings.stores[0], settings, NOW, state_dir, save=True)
+    out = runner.process_store(settings.stores[0], settings, NOW, state_dir, save=True)
+    opened = [a for a in out.alerts if a.kind == "store_open"]
+    assert opened and not re.search(r"\d", opened[0].note)
