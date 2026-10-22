@@ -1,6 +1,6 @@
 """Uso:
     python -m monitor                      roda todas as lojas
-    python -m monitor run --store whatcha  roda só uma loja
+    python -m monitor run --store elbe     roda só uma loja
     python -m monitor run --dry-run        mostra os alertas sem enviar e sem salvar o estado
     python -m monitor chat-id              lista os chats que falaram com o bot
     python -m monitor test-telegram        envia uma mensagem de teste

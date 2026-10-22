@@ -18,7 +18,7 @@ O monitor lê o catálogo **inteiro** de cada loja e avisa quando:
 Cada alerta chega com a **foto do produto**, nome, loja, preço e estoque, e tem:
 
 - **botões** "🛒 Comprar" e "🏪 Ver a loja";
-- **hashtags** da loja e do tipo (ex.: `#Whatcha #restock`). Tocando numa hashtag, você vê todos os alertas daquela loja ou daquele tipo;
+- **hashtags** da loja e do tipo (ex.: `#Elbe #restock`). Tocando numa hashtag, você vê todos os alertas daquela loja ou daquele tipo;
 - **selo de urgência** "🔥 Últimas unidades. Corre!" quando o estoque está baixo (limite em `urgencia_estoque`).
 
 **Produto novo sem foto** (a loja publicou antes de subir a imagem): o monitor espera até 2 verificações (~30 min) pela foto. Se o produto sair do ar nesse meio-tempo, nada é postado; se continuar sem foto, o alerta usa o logo da loja.
@@ -89,7 +89,7 @@ padrao:
 
 **Sobre os alertas:** dentro de `alertas`, a loja pode mudar só uma chave. As outras continuam vindo do `padrao`.
 
-> ⚠️ O estado de cada loja é salvo pelo **domínio** (ex.: `state/lojawhatcha.com.br.json`). Mudar o `nome` não tem problema. Já mudar a `url` para outro domínio faz a loja ganhar uma nova linha de base.
+> ⚠️ O estado de cada loja é salvo pelo **domínio** (ex.: `state/elbepolish.com.br.json`). Mudar o `nome` não tem problema. Já mudar a `url` para outro domínio faz a loja ganhar uma nova linha de base.
 
 ### Plataformas suportadas
 
@@ -150,7 +150,7 @@ source .venv/bin/activate
 pip install --require-hashes -r requirements.txt -r requirements-dev.txt
 
 python -m monitor                       # roda todas as lojas (envia alertas e salva o estado)
-python -m monitor run --store whatcha   # só uma loja
+python -m monitor run --store elbe      # só uma loja
 python -m monitor run --dry-run         # mostra os alertas sem enviar e sem salvar nada
 python -m pytest -q                     # testes
 

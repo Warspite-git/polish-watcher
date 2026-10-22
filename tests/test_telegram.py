@@ -205,14 +205,14 @@ def test_silent_only_for_less_urgent_alerts():
 
 def test_sold_out_replies_to_original_message():
     tg = FakeTelegram()
-    a = A(kind="sold_out", store="Whatcha", store_url="https://w.test", name="Rose Window",
+    a = A(kind="sold_out", store="Minha Loja", store_url="https://l.test", name="Esmalte Rosa",
           reply_to=777, note="Esgotou em menos de 15 minutos", available=False)
     tg.send_alert(a)
     method, data = tg.calls[0]
     assert method == "sendMessage" and data["disable_notification"] == "true"
     assert json.loads(data["reply_parameters"]) == {"message_id": 777, "allow_sending_without_reply": True}
     assert data["text"].startswith("⚡ <b>Esgotou em menos de 15 minutos!</b>")
-    assert "#Whatcha #esgotou" in data["text"] and "reply_markup" not in data
+    assert "#MinhaLoja #esgotou" in data["text"] and "reply_markup" not in data
 
 
 def test_rejected_button_falls_back_to_link_in_text():

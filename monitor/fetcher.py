@@ -41,7 +41,7 @@ class Fetcher:
     def __init__(self, delay: float = 1.5, allowed_host: Optional[str] = None, timeout=(10, 40),
                  retries: int = 3, backoff: float = 2.0):
         self.delay = delay
-        self.allowed_host = allowed_host  # ex.: "lojawhatcha.com.br" (sem www)
+        self.allowed_host = allowed_host  # ex.: "elbepolish.com.br" (sem www)
         self.timeout = timeout
         self.retries = retries
         self.backoff = backoff

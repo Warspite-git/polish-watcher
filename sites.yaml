@@ -43,9 +43,6 @@ lojas:
   - nome: VMystic
     url: https://www.shopbyvm.com/
 
-  - nome: Whatcha
-    url: https://www.lojawhatcha.com.br/
-
   # ------------------------------------------------------------------
   # Exemplo de loja com opções próprias (remova o "#" para usar):
   #
