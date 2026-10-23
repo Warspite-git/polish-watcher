@@ -257,7 +257,7 @@
     "370853656": {"name": "Amethyst in Love - Libra", "price": 80.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/amethyst-in-love-libra-e1xvp/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-16T05:00:34+00:00", "msgs": {"principal": 151, "privado": 37}}},
     "370853736": {"name": "After the rain - Libra", "price": 80.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/after-the-rain-libra-3qzi6/", "first_seen": "2026-10-11", "alert": {"at": "2026-10-20T18:00:35+00:00", "msgs": {"principal": 177, "privado": 121}}},
     "370853887": {"name": "Trio The Moon ( Tarot 2.0 Collection)", "price": 249.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/trio-the-moon-tarot-2-0-collection-1sh2l/", "first_seen": "2026-10-11"},
-    "370857459": {"name": "THE MOON", "price": 80.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/the-moon-1nk8i/", "first_seen": "2026-10-11"},
+    "370857459": {"name": "THE MOON", "price": 80.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/the-moon-1nk8i/", "first_seen": "2026-10-11"},
     "370857512": {"name": "I HAD A DREAM", "price": 80.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/i-had-a-dream-235b7/", "first_seen": "2026-10-11"},
     "370857777": {"name": "MEET ME OUTSIDE", "price": 80.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/meet-me-outside-10pdp/", "first_seen": "2026-10-11"},
     "370859475": {"name": "PLACA SBX 009", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/placa-sbx-009-1acj4/", "first_seen": "2026-10-11"},
