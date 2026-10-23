@@ -421,7 +421,7 @@
     "345254285": {"name": "Shadow Lord - Imã", "price": 55.0, "available": true, "stock": 3, "url": "https://nothingbasicstore.com/produtos/sushi-cat-ima-copia-1p4ru/", "first_seen": "2026-10-22"},
     "345257387": {"name": "Witc Cat - Imã", "price": 60.0, "available": true, "stock": null, "url": "https://nothingbasicstore.com/produtos/witc-cat-1efoy/", "first_seen": "2026-10-22"},
     "345258636": {"name": "Arcane Potion - Imã", "price": 60.0, "available": true, "stock": 6, "url": "https://nothingbasicstore.com/produtos/zombie-boy-ima-copia-1vg81/", "first_seen": "2026-10-22"},
-    "345434112": {"name": "Acessório Duas Bolinhas", "price": 40.0, "available": true, "stock": 1, "url": "https://nothingbasicstore.com/produtos/acessorio-duas-bolinhas-1h76e/", "first_seen": "2026-10-22"},
+    "345434112": {"name": "Acessório Duas Bolinhas", "price": 40.0, "available": false, "stock": 0, "url": "https://nothingbasicstore.com/produtos/acessorio-duas-bolinhas-1h76e/", "first_seen": "2026-10-22"},
     "345440194": {"name": "Pote NB", "price": 40.0, "available": true, "stock": 1, "url": "https://nothingbasicstore.com/produtos/pote-nb-1cddq/", "first_seen": "2026-10-22"},
     "345490691": {"name": "Acessório “X”", "price": 40.0, "available": true, "stock": 3, "url": "https://nothingbasicstore.com/produtos/acessorio-x-19slx/", "first_seen": "2026-10-22"},
     "345522913": {"name": "Pacote com 10 pincéis finos", "price": 10.0, "available": true, "stock": null, "url": "https://nothingbasicstore.com/produtos/pacote-com-10-pinceis-finos-1eswe/", "first_seen": "2026-10-22"},
