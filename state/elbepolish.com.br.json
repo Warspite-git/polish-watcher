@@ -75,7 +75,7 @@
     "278922122": {"name": "Petal walk", "price": 55.0, "available": true, "stock": 4, "url": "https://www.elbepolish.com.br/produtos/petal-walk/", "first_seen": "2026-10-11"},
     "278922156": {"name": "Mosslight", "price": 55.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/mosslight/", "first_seen": "2026-10-11"},
     "293965508": {"name": "Mother's heart", "price": 44.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/mothers-heart/", "first_seen": "2026-10-11"},
-    "300422044": {"name": "Masked treat", "price": 60.0, "available": true, "stock": 4, "url": "https://www.elbepolish.com.br/produtos/masked-treat-qxlmm/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-10-29"},
+    "300422044": {"name": "Masked treat", "price": 60.0, "available": true, "stock": 4, "url": "https://www.elbepolish.com.br/produtos/masked-treat-qxlmm/", "first_seen": "2026-10-11"},
     "300422803": {"name": "Little reaper", "price": 60.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/little-reaper-y473r/", "first_seen": "2026-10-11"},
     "300423257": {"name": "Toy terror", "price": 60.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/toy-terror-guyr4/", "first_seen": "2026-10-11"},
     "300424304": {"name": "Midnight claw", "price": 60.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/midnight-claw-t7sx0/", "first_seen": "2026-10-11"},
