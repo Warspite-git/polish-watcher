@@ -7,7 +7,7 @@
     "342090083": {"name": "Zombie Free 30ML", "price": 89.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/zombie-free-30ml/", "first_seen": "2026-10-11"},
     "342090618": {"name": "Cuticle Recovery 30ml", "price": 89.0, "available": true, "stock": 8, "url": "https://www.shopbyvm.com/produtos/cuticle-recovery-30ml/", "first_seen": "2026-10-11"},
     "342092617": {"name": "Duo de Tratamento Intensivo", "price": 65.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/duo-de-tratamento-intensivo/", "first_seen": "2026-10-11"},
-    "342093092": {"name": "V-Skin 65gr /60ml", "price": 83.0, "available": true, "stock": 12, "url": "https://www.shopbyvm.com/produtos/v-skin-30gr/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-28T00:45:21+00:00", "msgs": {"principal": 303, "privado": 205}}, "posts": [{"at": "2026-10-28T00:45:21+00:00", "msgs": {"principal": 303, "privado": 205}}]},
+    "342093092": {"name": "V-Skin 65gr /60ml", "price": 83.0, "available": true, "stock": 12, "url": "https://www.shopbyvm.com/produtos/v-skin-30gr/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-28T00:45:21+00:00", "msgs": {"principal": 303, "privado": 205}}},
     "342094129": {"name": "Chaveiro Nail Guard VM", "price": 25.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/chaveiro-nail-guard-vm/", "first_seen": "2026-10-11"},
     "342103928": {"name": "FideLIsa", "price": 70.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/fidelisa/", "first_seen": "2026-10-11"},
     "342104109": {"name": "EternIsa", "price": 70.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/eternisa/", "first_seen": "2026-10-11", "nv": 1},
