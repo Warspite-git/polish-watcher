@@ -42,7 +42,7 @@
     "342359500": {"name": "Forged in Chaos", "price": 75.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/forged-in-chaos-yffr2/", "first_seen": "2026-10-11"},
     "342359501": {"name": "First Trace", "price": 75.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/first-trace-dwz3c/", "first_seen": "2026-10-11"},
     "342359502": {"name": "Endurance", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/endurance-13qq3/", "first_seen": "2026-10-11"},
-    "342359504": {"name": "Core Essence", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/core-essence-19h0m/", "first_seen": "2026-10-11"},
+    "342359504": {"name": "Core Essence", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/core-essence-19h0m/", "first_seen": "2026-10-11"},
     "342359506": {"name": "Balance", "price": 75.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/balance-19qz9/", "first_seen": "2026-10-11"},
     "342359509": {"name": "Against the Tide", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/against-the-tide-15ybs/", "first_seen": "2026-10-11"},
     "342359692": {"name": "WHOLEHEARTED Collection ( 25 esmaltes )", "price": 1870.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/wholehearted-collection-25-esmaltes/", "first_seen": "2026-10-11"},
