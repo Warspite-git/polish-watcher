@@ -428,7 +428,7 @@
     "345523086": {"name": "Pacote com 10 pincéis grossos", "price": 10.0, "available": true, "stock": null, "url": "https://nothingbasicstore.com/produtos/pacote-com-10-pinceis-grossos-1w4u8/", "first_seen": "2026-10-22"},
     "367611574": {"name": "Acessório Grade 2", "price": 40.0, "available": true, "stock": 5, "url": "https://nothingbasicstore.com/produtos/acessorio-grade-2-0-zfquw/", "first_seen": "2026-10-22"},
     "367612718": {"name": "Acessório Curvas 2", "price": 40.0, "available": true, "stock": 17, "url": "https://nothingbasicstore.com/produtos/acessorio-curvas-3-wja98/", "first_seen": "2026-10-22"},
-    "367613020": {"name": "Acessório Alça", "price": 40.0, "available": true, "stock": 14, "url": "https://nothingbasicstore.com/produtos/acessorio-alca-1409u/", "first_seen": "2026-10-22"},
+    "367613020": {"name": "Acessório Alça", "price": 40.0, "available": true, "stock": 15, "url": "https://nothingbasicstore.com/produtos/acessorio-alca-1409u/", "first_seen": "2026-10-22", "nv": 1},
     "367613132": {"name": "Acessório Francesinha", "price": 40.0, "available": true, "stock": 11, "url": "https://nothingbasicstore.com/produtos/acessorio-francesinha-1tuh8/", "first_seen": "2026-10-22"},
     "367613279": {"name": "Acessório Listras", "price": 40.0, "available": true, "stock": 15, "url": "https://nothingbasicstore.com/produtos/acessorio-listras-1rx4s/", "first_seen": "2026-10-22"},
     "367613417": {"name": "Acessório Laço", "price": 40.0, "available": true, "stock": 16, "url": "https://nothingbasicstore.com/produtos/acessorio-laco-9ytuu/", "first_seen": "2026-10-22"},
