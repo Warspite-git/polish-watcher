@@ -130,7 +130,7 @@
     "344314554": {"name": "Winter", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/winter-or4xk/", "first_seen": "2026-10-11"},
     "344314555": {"name": "Starry sky", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/starry-sky-c8nki/", "first_seen": "2026-10-11"},
     "344314557": {"name": "Snowflake", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/snowflake-hibmn/", "first_seen": "2026-10-11"},
-    "344314560": {"name": "Snow Globe", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/snow-globe-zcc9i/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-20T17:56:07+00:00", "msgs": {"principal": 162, "privado": 106}}},
+    "344314560": {"name": "Snow Globe", "price": 75.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/snow-globe-zcc9i/", "first_seen": "2026-10-11", "nv": 1},
     "344314561": {"name": "Fairy Lights", "price": 75.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/share-lights-98mbc/", "first_seen": "2026-10-11"},
     "344314564": {"name": "Poinsettia", "price": 75.0, "available": true, "stock": 8, "url": "https://www.shopbyvm.com/produtos/poinsettia-zk577/", "first_seen": "2026-10-11"},
     "344314565": {"name": "Pine Tree", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/pine-tree-tyx9c/", "first_seen": "2026-10-11"},
