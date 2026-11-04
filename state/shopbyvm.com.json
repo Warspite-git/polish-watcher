@@ -1,7 +1,7 @@
 {
   "platform": "nuvemshop",
   "baseline": "2026-10-11T03:13:03+00:00",
-  "status": "open",
+  "status": "password",
   "errors": 0,
   "products": {
     "342090083": {"name": "Zombie Free 30ML", "price": 89.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/zombie-free-30ml/", "first_seen": "2026-10-11"},
