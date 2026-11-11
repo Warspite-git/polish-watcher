@@ -68,7 +68,7 @@
     "342455821": {"name": "Imã duplo para esmalte magnético", "price": 30.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/ima-duplo-para-esmalte-magnetico/", "first_seen": "2026-10-11"},
     "342587816": {"name": "Purrrfect hex - MNP", "price": 75.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/purrrfect-hex-mnp/", "first_seen": "2026-10-11"},
     "342587820": {"name": "Salem - MNP", "price": 75.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/salem-mnp/", "first_seen": "2026-10-11"},
-    "342587821": {"name": "Spellcat - MNP", "price": 75.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/spellcat-mnp1/", "first_seen": "2026-10-11"},
+    "342587821": {"name": "Spellcat - MNP", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/spellcat-mnp1/", "first_seen": "2026-10-11"},
     "342587822": {"name": "Mrs. Mystipaw - MNP", "price": 75.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/mrs-mystipaw-mnp/", "first_seen": "2026-10-11"},
     "342587823": {"name": "Meownlight - MNP", "price": 75.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/meownlight-mnp/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-10-20T18:00:35+00:00", "msgs": {"principal": 171, "privado": 115}}},
     "342587824": {"name": "Meowgical Night - MNP", "price": 75.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/meowgical-night-mnp/", "first_seen": "2026-10-11"},
