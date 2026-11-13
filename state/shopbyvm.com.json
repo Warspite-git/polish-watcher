@@ -24,7 +24,7 @@
     "342359472": {"name": "Vulnerability", "price": 75.0, "available": true, "stock": 8, "url": "https://www.shopbyvm.com/produtos/vulnerability-rf5q5/", "first_seen": "2026-10-11"},
     "342359473": {"name": "Under Pressure", "price": 75.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/under-pressure-1hcos/", "first_seen": "2026-10-11"},
     "342359474": {"name": "Turning Point", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/turning-point-1oqi8/", "first_seen": "2026-10-11"},
-    "342359475": {"name": "True Path", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/true-path-1ba5d/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-11T22:00:40+00:00", "msgs": {"principal": 357, "privado": 296}}, "posts": [{"at": "2026-11-11T22:00:40+00:00", "msgs": {"principal": 357, "privado": 296}}]},
+    "342359475": {"name": "True Path", "price": 75.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/true-path-1ba5d/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-11T22:00:40+00:00", "msgs": {"principal": 357, "privado": 296}}},
     "342359477": {"name": "Timeless", "price": 75.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/timeless-1eime/", "first_seen": "2026-10-11"},
     "342359478": {"name": "The Signature", "price": 75.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/the-signature-13daz/", "first_seen": "2026-10-11"},
     "342359479": {"name": "The Origin", "price": 75.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/the-origin-vlcxz/", "first_seen": "2026-10-11"},
