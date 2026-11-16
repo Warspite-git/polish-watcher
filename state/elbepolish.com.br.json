@@ -5,8 +5,8 @@
   "errors": 0,
   "products": {
     "216497246": {"name": "Hot Shower", "price": 33.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/hot-shower/", "first_seen": "2026-10-11"},
-    "216498817": {"name": "Sweater", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/sweater/", "first_seen": "2026-10-11"},
-    "216500405": {"name": "Amarelinha", "price": 33.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/amarelinha/", "first_seen": "2026-10-11"},
+    "216498817": {"name": "Sweater", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/sweater/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-11-16"},
+    "216500405": {"name": "Amarelinha", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/amarelinha/", "first_seen": "2026-10-11"},
     "216500614": {"name": "Pula Corda", "price": 38.5, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/pula-corda/", "first_seen": "2026-10-11"},
     "216501069": {"name": "Telefone sem fio", "price": 38.5, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/telefone-sem-fio/", "first_seen": "2026-10-11"},
     "216501302": {"name": "Pega pega", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/pega-pega/", "first_seen": "2026-10-11"},
@@ -53,7 +53,7 @@
     "244811850": {"name": "Tristeza", "price": 55.0, "available": true, "stock": 6, "url": "https://www.elbepolish.com.br/produtos/tristeza/", "first_seen": "2026-10-11"},
     "244812022": {"name": "Vergonha", "price": 55.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/vergonha/", "first_seen": "2026-10-11"},
     "244813137": {"name": "Bolsinha prateada", "price": 24.5, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/bolsinha-prateada/", "first_seen": "2026-10-11"},
-    "244817378": {"name": "Imã para efeito Veludo", "price": 60.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/ima-para-efeito-veludo/", "first_seen": "2026-10-11"},
+    "244817378": {"name": "Imã para efeito Veludo", "price": 60.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/ima-para-efeito-veludo/", "first_seen": "2026-10-11"},
     "252333343": {"name": "Mystery Bag 10 Esmaltes", "price": 600.0, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/mystery-bag-10-esmaltes/", "first_seen": "2026-10-11"},
     "257237362": {"name": "Esmalte Wealth", "price": 34.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/esmalte-wealth/", "first_seen": "2026-10-11"},
     "257272822": {"name": "Desert Sands", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/desert-sands/", "first_seen": "2026-10-11"},
@@ -91,10 +91,10 @@
     "305808627": {"name": "Kookie", "price": 60.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/kookie-o38wg/", "first_seen": "2026-10-11"},
     "305809166": {"name": "Nam", "price": 60.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/nam-hvbsk/", "first_seen": "2026-10-11"},
     "305809707": {"name": "Yoon", "price": 60.0, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/yoon-s9g18/", "first_seen": "2026-10-11"},
-    "305812084": {"name": "Caixa decorativa com mini microfones", "price": 45.0, "available": true, "stock": 3, "url": "https://www.elbepolish.com.br/produtos/caixa-decorativa-com-mini-microfones-yh1xd/", "first_seen": "2026-10-11"},
-    "305815643": {"name": "Mini Army bomb chaveiro", "price": 13.5, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/mini-army-bomb-chaveiro-a5ky8/", "first_seen": "2026-10-11"},
+    "305812084": {"name": "Caixa decorativa com mini microfones", "price": 45.0, "available": true, "stock": 3, "url": "https://www.elbepolish.com.br/produtos/caixa-decorativa-com-mini-microfones-yh1xd/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-11-16"},
+    "305815643": {"name": "Mini Army bomb chaveiro", "price": 13.5, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/mini-army-bomb-chaveiro-a5ky8/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-11-16"},
     "305816861": {"name": "Coleção Bangtan boys com necessarie", "price": 427.5, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/colecao-bangtan-boys-com-necessarie-o5k25/", "first_seen": "2026-10-11"},
-    "305817359": {"name": "Necessarie lilás holográfica", "price": 35.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/necessarie-lilas-holografica-jgqnk/", "first_seen": "2026-10-11"},
+    "305817359": {"name": "Necessarie lilás holográfica", "price": 35.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/necessarie-lilas-holografica-jgqnk/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-11-16"},
     "309947684": {"name": "Velvet ribbon", "price": 60.0, "available": true, "stock": 6, "url": "https://www.elbepolish.com.br/produtos/velvet-ribbon-vr0ta/", "first_seen": "2026-10-11"},
     "309947812": {"name": "Pine needle", "price": 60.0, "available": true, "stock": 3, "url": "https://www.elbepolish.com.br/produtos/pine-needle-pnqrj/", "first_seen": "2026-10-11"},
     "309947938": {"name": "Twinkle lights", "price": 60.0, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/twinkle-lights-k0hew/", "first_seen": "2026-10-11"},
@@ -106,7 +106,7 @@
     "309952803": {"name": "Coleção Christmas at home", "price": 450.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/colecao-christmas-at-home-gblqp/", "first_seen": "2026-10-11"},
     "310963561": {"name": "Tenho exclusivo guardado", "price": 0.01, "available": true, "stock": null, "url": "https://www.elbepolish.com.br/produtos/tenho-exclusivo-guardado-q1424/", "first_seen": "2026-10-11"},
     "311487256": {"name": "Army", "price": 60.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/army-rnrma/", "first_seen": "2026-10-11"},
-    "311487661": {"name": "Brinde BF 2025", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/brinde-bf-2025-lxgpc/", "first_seen": "2026-10-11"},
+    "311487661": {"name": "Brinde BF 2025", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/brinde-bf-2025-lxgpc/", "first_seen": "2026-10-11", "missing": 1, "missing_since": "2026-11-16"},
     "326372039": {"name": "Vestido de noiva", "price": 65.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/vestido-de-noiva-n8woo/", "first_seen": "2026-10-11"},
     "326372733": {"name": "Era apenas um sonho", "price": 65.0, "available": true, "stock": 4, "url": "https://www.elbepolish.com.br/produtos/era-apenas-um-sonho-np34b/", "first_seen": "2026-10-11"},
     "326373238": {"name": "De uma menina", "price": 65.0, "available": true, "stock": 3, "url": "https://www.elbepolish.com.br/produtos/de-uma-menina-1j5y9/", "first_seen": "2026-10-11"},
@@ -139,6 +139,6 @@
     "376391208": {"name": "Pré venda LBH de Outubro: Fussy (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 15, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-fussy-envios-apos-o-dia-07-11-qalgz/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
     "376391555": {"name": "Pré venda LBH de Outubro: Chaotic (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 18, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-chaotic-envios-apos-o-dia-07-11-1pipk/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
     "376391937": {"name": "Pré venda LBH de Outubro: Trickster (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 18, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-trickster-envios-apos-o-dia-07-11-qci32/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
-    "381110709": {"name": "Pré venda HHC de novembro: Time and destruction (envio após o dia 30/11)", "price": 75.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/pre-venda-hhc-de-novembro-time-and-destruction-envio-apos-o-dia-30-11-yqbvx/", "first_seen": "2026-11-14", "nv": 1, "alert": {"at": "2026-11-14T12:45:23+00:00", "msgs": {"principal": 358, "privado": 327}}}
+    "381110709": {"name": "Pré venda HHC de novembro: Time and destruction (envio após o dia 30/11)", "price": 75.0, "available": true, "stock": 4, "url": "https://www.elbepolish.com.br/produtos/pre-venda-hhc-de-novembro-time-and-destruction-envio-apos-o-dia-30-11-yqbvx/", "first_seen": "2026-11-14", "nv": 1, "alert": {"at": "2026-11-14T12:45:23+00:00", "msgs": {"principal": 358, "privado": 327}}}
   }
 }
