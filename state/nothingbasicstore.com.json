@@ -69,7 +69,7 @@
     "160175282": {"name": "Sparkle - Unicorns", "price": 60.0, "available": true, "stock": 3, "url": "https://nothingbasicstore.com/produtos/sparkle-unicorns/", "first_seen": "2026-10-22"},
     "160175426": {"name": "Sunny - Unicorns", "price": 60.0, "available": true, "stock": 10, "url": "https://nothingbasicstore.com/produtos/sunny-unicorns/", "first_seen": "2026-10-22"},
     "160175533": {"name": "Sunrise Kiss - Unicorns", "price": 60.0, "available": true, "stock": 7, "url": "https://nothingbasicstore.com/produtos/sunrise-kiss-unicorns/", "first_seen": "2026-10-22"},
-    "160175734": {"name": "Sunshine - Unicorns", "price": 60.0, "available": true, "stock": 2, "url": "https://nothingbasicstore.com/produtos/sunshine-unicorns/", "first_seen": "2026-10-22"},
+    "160175734": {"name": "Sunshine - Unicorns", "price": 60.0, "available": false, "stock": 0, "url": "https://nothingbasicstore.com/produtos/sunshine-unicorns/", "first_seen": "2026-10-22"},
     "160370427": {"name": "Sea Life 2", "price": 45.0, "available": true, "stock": 15, "url": "https://nothingbasicstore.com/produtos/sea-life-2/", "first_seen": "2026-10-22"},
     "160719063": {"name": "Blended", "price": 45.0, "available": true, "stock": 14, "url": "https://nothingbasicstore.com/produtos/blended/", "first_seen": "2026-10-22"},
     "161000384": {"name": "Ho Ho Ho!", "price": 45.0, "available": true, "stock": 11, "url": "https://nothingbasicstore.com/produtos/ho-ho-ho1/", "first_seen": "2026-10-22"},
