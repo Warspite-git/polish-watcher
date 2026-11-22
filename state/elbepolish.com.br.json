@@ -12,7 +12,7 @@
     "216501302": {"name": "Pega pega", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/pega-pega/", "first_seen": "2026-10-11"},
     "216501548": {"name": "Esconde esconde", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/esconde-esconde/", "first_seen": "2026-10-11"},
     "216501687": {"name": "Adoleta", "price": 38.5, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/adoleta/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
-    "216683096": {"name": "Mystery Bag - 3 esmaltes", "price": 225.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/mystery-bag-3-esmaltes/", "first_seen": "2026-10-11"},
+    "216683096": {"name": "Mystery Bag - 3 esmaltes", "price": 180.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/mystery-bag-3-esmaltes/", "first_seen": "2026-10-11"},
     "216684459": {"name": "Vitality", "price": 55.0, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/vitality/", "first_seen": "2026-10-11"},
     "216684731": {"name": "Renaissance", "price": 55.0, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/renaissance/", "first_seen": "2026-10-11"},
     "216685560": {"name": "Strenght", "price": 55.0, "available": true, "stock": 2, "url": "https://www.elbepolish.com.br/produtos/strenght/", "first_seen": "2026-10-11"},
@@ -139,6 +139,6 @@
     "376391208": {"name": "Pré venda LBH de Outubro: Fussy (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 15, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-fussy-envios-apos-o-dia-07-11-qalgz/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
     "376391555": {"name": "Pré venda LBH de Outubro: Chaotic (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 18, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-chaotic-envios-apos-o-dia-07-11-1pipk/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
     "376391937": {"name": "Pré venda LBH de Outubro: Trickster (Envios após o dia 07/11)", "price": 75.0, "available": false, "stock": 18, "url": "https://www.elbepolish.com.br/produtos/pre-venda-lbh-de-outubro-trickster-envios-apos-o-dia-07-11-qci32/", "first_seen": "2026-10-23", "nv": 1, "missing": 2, "missing_since": "2026-11-05"},
-    "381110709": {"name": "Pré venda HHC de novembro: Time and destruction (envio após o dia 30/11)", "price": 75.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/pre-venda-hhc-de-novembro-time-and-destruction-envio-apos-o-dia-30-11-yqbvx/", "first_seen": "2026-11-14", "nv": 1}
+    "381110709": {"name": "Pré venda HHC de novembro: Time and destruction (envio após o dia 30/11)", "price": 75.0, "available": true, "stock": 5, "url": "https://www.elbepolish.com.br/produtos/pre-venda-hhc-de-novembro-time-and-destruction-envio-apos-o-dia-30-11-yqbvx/", "first_seen": "2026-11-14", "nv": 1, "posts": [{"at": "2026-11-22T03:45:21+00:00", "msgs": {"principal": 413, "privado": 483}}], "alert": {"at": "2026-11-22T03:45:21+00:00", "msgs": {"principal": 413, "privado": 483}}}
   }
 }
