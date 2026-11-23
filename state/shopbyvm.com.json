@@ -120,7 +120,7 @@
     "344314377": {"name": "HARMONISA", "price": 80.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/harmonisa-luopk/", "first_seen": "2026-10-11"},
     "344314383": {"name": "MAGICISA", "price": 80.0, "available": true, "stock": 9, "url": "https://www.shopbyvm.com/produtos/magicisa-ieryk/", "first_seen": "2026-10-11"},
     "344314387": {"name": "PRESENTISA", "price": 80.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/presentisa-ba740/", "first_seen": "2026-10-11"},
-    "344314394": {"name": "SNOWISA", "price": 80.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/snowisa-fd1n6/", "first_seen": "2026-10-11", "nv": 1, "posts": [{"at": "2026-11-23T01:30:26+00:00", "msgs": {"principal": 438, "privado": 510}}], "alert": {"at": "2026-11-23T01:30:26+00:00", "msgs": {"principal": 438, "privado": 510}}},
+    "344314394": {"name": "SNOWISA", "price": 80.0, "available": true, "stock": 7, "url": "https://www.shopbyvm.com/produtos/snowisa-fd1n6/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-23T01:30:26+00:00", "msgs": {"principal": 438, "privado": 510}}, "posts": [{"at": "2026-11-23T01:30:26+00:00", "msgs": {"principal": 438, "privado": 510}}]},
     "344314396": {"name": "PROSPERISA", "price": 80.0, "available": true, "stock": 2, "url": "https://www.shopbyvm.com/produtos/prosperisa-p9i5k/", "first_seen": "2026-10-11"},
     "344314398": {"name": "AFETISA", "price": 80.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/afetisa-eyasc/", "first_seen": "2026-10-11"},
     "344314402": {"name": "ALEGRISA", "price": 80.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/alegrisa-3h5ra/", "first_seen": "2026-10-11"},
