@@ -149,7 +149,7 @@
     "344314591": {"name": "Christmas Spirit Collection", "price": 1475.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/christmas-spirit-collection-mvesx/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-02"},
     "344314727": {"name": "HYPNOTISA Collection", "price": 625.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/hypnotisa-collection1/", "first_seen": "2026-10-11"},
     "344314736": {"name": "SereiISA", "price": 80.0, "available": false, "stock": 0, "url": "https://www.shopbyvm.com/produtos/sereiisa/", "first_seen": "2026-10-11"},
-    "344314737": {"name": "MetamorfISA", "price": 80.0, "available": true, "stock": 4, "url": "https://www.shopbyvm.com/produtos/metamorfisa/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-16T13:45:41+00:00", "msgs": {"principal": 373, "privado": 396}}},
+    "344314737": {"name": "MetamorfISA", "price": 80.0, "available": true, "stock": 3, "url": "https://www.shopbyvm.com/produtos/metamorfisa/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-16T13:45:41+00:00", "msgs": {"principal": 373, "privado": 396}}},
     "344314739": {"name": "RomantISA", "price": 80.0, "available": true, "stock": 6, "url": "https://www.shopbyvm.com/produtos/romantisa/", "first_seen": "2026-10-11"},
     "344314740": {"name": "AlquimISA", "price": 80.0, "available": true, "stock": 1, "url": "https://www.shopbyvm.com/produtos/alquimisa/", "first_seen": "2026-10-11"},
     "344314743": {"name": "GalaxISA", "price": 80.0, "available": true, "stock": 5, "url": "https://www.shopbyvm.com/produtos/galaxisa/", "first_seen": "2026-10-11", "nv": 1, "alert": {"at": "2026-11-16T13:45:41+00:00", "msgs": {"principal": 374, "privado": 397}}},
