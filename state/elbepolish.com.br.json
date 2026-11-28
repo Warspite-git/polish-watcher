@@ -58,7 +58,7 @@
     "257237362": {"name": "Esmalte Wealth", "price": 34.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/esmalte-wealth/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
     "257272822": {"name": "Desert Sands", "price": 33.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/desert-sands/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
     "278624283": {"name": "A mother's love knows no limits", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/a-mothers-love-knows-no-limits/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
-    "278628444": {"name": "Best mom ever", "price": 46.75, "available": true, "stock": 1, "url": "https://www.elbepolish.com.br/produtos/best-mom-ever/", "first_seen": "2026-10-11"},
+    "278628444": {"name": "Best mom ever", "price": 46.75, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/best-mom-ever/", "first_seen": "2026-10-11"},
     "278629082": {"name": "Lonely motherhood", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/lonely-motherhood/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
     "278630468": {"name": "Expression of love", "price": 55.0, "available": false, "stock": 0, "url": "https://www.elbepolish.com.br/produtos/expression-of-love/", "first_seen": "2026-10-11", "missing": 2, "missing_since": "2026-11-19"},
     "278630892": {"name": "You're an amazing mom", "price": 44.0, "available": true, "stock": 6, "url": "https://www.elbepolish.com.br/produtos/youre-an-amazing-mom/", "first_seen": "2026-10-11"},
